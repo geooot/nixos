@@ -44,11 +44,13 @@
     xkb.variant = "";
   };
 
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.theme = "where_is_my_sddm_theme";
-
-
-  
+  services.displayManager.sddm = {
+    enable = true;
+    theme = "where_is_my_sddm_theme";
+    extraPackages = [
+      pkgs.where-is-my-sddm-theme
+    ];
+  };
 
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
@@ -67,6 +69,8 @@
     pulse.enable = true;
     jack.enable = true;
   };
+
+  services.tailscale.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
@@ -92,6 +96,8 @@
       obs-studio
       blender
       btop
+      steam
+      tmux
     ];
   };
 
@@ -122,6 +128,7 @@
     fzf
     ripgrep
     htop
+    wayvnc
   ];
 
   stylix.image = /etc/nixos/background.png; 
@@ -153,6 +160,12 @@
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
+  };
+
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
   
   services.gvfs.enable = true; # Mount, trash, and other functionalities
@@ -202,8 +215,8 @@
   };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 57621 ];
-  networking.firewall.allowedUDPPorts = [ 5353 ];
+  networking.firewall.allowedTCPPorts = [ 57621 5900 ];
+  networking.firewall.allowedUDPPorts = [ 5353 5900 ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 

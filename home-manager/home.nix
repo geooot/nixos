@@ -57,6 +57,10 @@
     style.name = "Breeze";
   };
 
+  programs.tmux = {
+    enable = true;
+    clock24 = true;
+  };
 
   programs.git = {
     enable = true;
@@ -145,6 +149,7 @@ window#waybar {
         "DP-1,2560x1440,2560x0,1"
       ];
       exec-once = [
+        ''${pkgs.wayvnc}/bin/wayvnc -g''
         ''${pkgs.waybar}/bin/waybar''
         ''${pkgs.swww}/bin/swww-daemon''
         ''${pkgs.dunst}/bin/dunst''
@@ -176,6 +181,11 @@ window#waybar {
 	    disable_splash_rendering = true;
       };
 
+      bindm = [
+        "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
+      ];
+
       bind = [
         "$mod, Return, exec, $terminal"
         "$mod, C, killactive"
@@ -190,6 +200,7 @@ window#waybar {
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
+
 
         # Switch workspaces with mod and numbers
         "$mod, 1, workspace, 1"
