@@ -74,7 +74,7 @@
       settings.main = {
           layer = "top";
           position = "top";
-          clock.format = "{:%I:%M%p}";
+          clock.format = "{:%I:%M %p}";
           tray.spacing = 8;
           modules-left = [
             "hyprland/workspaces"
@@ -90,6 +90,7 @@
       style = ''
 * {
     font-size: 14px;
+    font-family: "Berkeley Mono Variable";
 }
 
 window#waybar { 

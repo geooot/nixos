@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ inputs, outputs, config, lib, pkgs, ... }:
+{ inputs, outputs, config, system, lib, pkgs, ... }:
 
 {
   imports =
@@ -18,6 +18,10 @@
   boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
 
   nixpkgs.config.allowUnfree = true;
+
+  fonts.packages = [
+    inputs.fontpkgs.packages.x86_64-linux.berkeley-mono
+  ];
 
   networking.hostName = "dosa"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -134,6 +138,10 @@
   stylix.image = /etc/nixos/background.png; 
   stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/primer-dark-dimmed.yaml";
   stylix.polarity = "dark";
+  stylix.fonts.monospace = {
+    package = inputs.fontpkgs.packages.x86_64-linux.berkeley-mono;
+    name = "Berkeley Mono Variable";
+  };
   
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -165,6 +173,7 @@
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    gamescopeSession.enable = true;
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
   

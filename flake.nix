@@ -19,16 +19,23 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Private flakes
+    fontpkgs = {
+      url = "git+file:///home/george/github.com/geooot/fonts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = {self, stylix, nixpkgs, ...} @ inputs: let
+  outputs = {self, stylix, nixpkgs, disko, fontpkgs, ...} @ inputs: let
     inherit (self) outputs;
   in {
     nixosConfigurations.dosa = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs outputs;};
       modules = [
         stylix.nixosModules.stylix
-        inputs.disko.nixosModules.default
+        disko.nixosModules.default
         (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
 
         ./nixos/configuration.nix
