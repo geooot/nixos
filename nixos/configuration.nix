@@ -102,6 +102,7 @@
       btop
       steam
       tmux
+      obsidian
     ];
   };
 
