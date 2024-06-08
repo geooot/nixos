@@ -88,6 +88,10 @@
       spotify
       cargo
       neofetch
+      discord
+      obs-studio
+      blender
+      btop
     ];
   };
 
@@ -121,9 +125,9 @@
   ];
 
   stylix.image = /etc/nixos/background.png; 
-  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
+  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/primer-dark-dimmed.yaml";
   stylix.polarity = "dark";
-
+  
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -191,7 +195,7 @@
   };
 
   xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
