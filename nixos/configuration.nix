@@ -48,6 +48,11 @@
     xkb.variant = "";
   };
 
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+  };
+
   services.displayManager.sddm = {
     enable = true;
     theme = "where_is_my_sddm_theme";
@@ -230,7 +235,7 @@
   networking.firewall.allowedTCPPorts = [ 57621 5900 ];
   networking.firewall.allowedUDPPorts = [ 5353 5900 ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
