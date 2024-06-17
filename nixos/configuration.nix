@@ -103,6 +103,8 @@
       steam
       tmux
       obsidian
+      mpv
+      imv
     ];
   };
 

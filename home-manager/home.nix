@@ -146,6 +146,10 @@ window#waybar {
     enable = true;
   };
 
+  programs.alacritty = {
+    enable = true;
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
@@ -196,6 +200,7 @@ window#waybar {
         "$mod, C, killactive"
         "$mod, E, exec, $fileManager"
         "$mod, V, togglefloating"
+        "$mod, M, fullscreen, 1"
         "$mod, R, exec, $menu"
         "$mod, P, pseudo" # dwindle
         "$mod, J, togglesplit"
@@ -205,8 +210,19 @@ window#waybar {
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
+        
+        # Move workspace to monitor 
+        "$mod Ctrl, left, movecurrentworkspacetomonitor, l"
+        "$mod Ctrl, right, movecurrentworkspacetomonitor, r"
 
-
+        # Switch workspaces relatively 
+        "$mod Super, left, workspace, r-1"
+        "$mod Super, right, workspace, r+1"
+        
+        # Move active window to workspace relatively 
+        "$mod Shift, left, movetoworkspace, r-1"
+        "$mod Shift, right, movetoworkspace, r+1"
+        
         # Switch workspaces with mod and numbers
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
