@@ -73,7 +73,7 @@
       enable = true;
       settings.main = {
           layer = "top";
-          position = "bottom";
+          position = "top";
           clock.format = "{:%I:%M %p}";
           tray.spacing = 8;
           modules-left = [
