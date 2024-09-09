@@ -50,8 +50,6 @@
   # Enable home-manager and git
   programs.home-manager.enable = true;
 
-  gtk.enable = true;
-
   qt = {
     enable = true;
     style.name = "Breeze";

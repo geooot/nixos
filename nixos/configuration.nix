@@ -42,23 +42,10 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
-  services.xserver = {
-    enable = true;
-    xkb.layout = "us";
-    xkb.variant = "";
-  };
 
   services.sunshine = {
     enable = true;
     autoStart = true;
-  };
-
-  services.displayManager.sddm = {
-    enable = true;
-    theme = "where_is_my_sddm_theme";
-    extraPackages = [
-      pkgs.where-is-my-sddm-theme
-    ];
   };
 
   # Configure keymap in X11
@@ -136,7 +123,6 @@
     qt6.qtwayland
     qt6Packages.qtstyleplugin-kvantum
     kdePackages.breeze
-    where-is-my-sddm-theme
     fzf
     ripgrep
     htop
@@ -187,6 +173,15 @@
   
   services.gvfs.enable = true; # Mount, trash, and other functionalities
   services.tumbler.enable = true; # Thumbnail support for images
+  services.greetd = {
+    enable = true;
+    settings = { 
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions ${pkgs.hyprland}/share/wayland-sessions";
+        user = "greeter";
+      };
+    };
+  };
   
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
