@@ -24,7 +24,7 @@
 
       # Or define it inline, for example:
       # (final: prev: {
-      #   hi = final.hello.overrideAttrs (oldAttrs: {
+      #   hi = final.hello.overrideAttrs (oldAttdrs: {
       #     patches = [ ./change-hello-to-hi.patch ];
       #   });
       # })
@@ -177,6 +177,9 @@ window#waybar {
       input = {
       	kb_layout = "us";
       };
+      env = [
+        "HYPRCURSOR_THEME,rose-pine-hyprcursor"
+      ];
 
       "$mod" = "Alt";
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';

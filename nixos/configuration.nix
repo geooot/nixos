@@ -46,6 +46,8 @@
   services.sunshine = {
     enable = true;
     autoStart = true;
+    capSysAdmin = true;
+    openFirewall = true;
   };
 
   # Configure keymap in X11
@@ -127,6 +129,8 @@
     ripgrep
     htop
     wayvnc
+    pavucontrol
+    inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
   ];
 
   stylix.image = /etc/nixos/background.png; 
@@ -227,8 +231,13 @@
   };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 57621 5900 ];
-  networking.firewall.allowedUDPPorts = [ 5353 5900 ];
+  networking.firewall.allowedTCPPorts = [ 57621 5900 47984 47989 47990 48010];
+  networking.firewall.allowedUDPPorts = [
+    5353
+    5900
+    { from = 47998; to = 48000; }
+    { from = 8000; to = 8010; }
+  ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
 
