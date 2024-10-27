@@ -82,7 +82,7 @@
       neovim
       waybar
       alacritty
-      chromium
+      firefox 
       rofi-wayland
       dunst
       swww
@@ -191,7 +191,7 @@
   services.xserver.videoDrivers = ["nvidia"];
 
   hardware = {
-    opengl.enable = true;
+    graphics.enable = true;
     nvidia = {
       package = config.boot.kernelPackages.nvidiaPackages.production;
 
@@ -215,7 +215,7 @@
       # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
       # Only available from driver 515.43.04+
       # Currently alpha-quality/buggy, so false is currently the recommended setting.
-      open = false;
+      open = true;
 
       # Enable the Nvidia settings menu,
 	  # accessible via `nvidia-settings`.
