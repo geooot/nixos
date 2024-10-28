@@ -181,7 +181,7 @@ window#waybar {
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
       ];
 
-      "$mod" = "Alt";
+      "$mod" = "Super";
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
       "$menu" = ''${pkgs.rofi-wayland}/bin/rofi -show run -show-icons'';
       "$fileManager" = ''${pkgs.xfce.thunar}/bin/thunar'';
@@ -191,6 +191,11 @@ window#waybar {
 	    disable_splash_rendering = true;
       };
 
+      animation = [
+        "global, 1, 1, default"
+        "windows, 1, 1, default, popin 95%"
+      ];
+
       bindm = [
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
@@ -198,12 +203,12 @@ window#waybar {
 
       bind = [
         "$mod, Return, exec, $terminal"
-        "$mod, C, killactive"
+        "$mod, Q, killactive"
         "$mod, E, exec, $fileManager"
         "$mod, V, togglefloating"
         "$mod, M, fullscreen, 1"
-        "$mod, R, exec, $menu"
-        "$mod, P, pseudo" # dwindle
+        "$mod, space, exec, $menu"
+        "$mod Alt, P, pseudo" # dwindle
         "$mod, J, togglesplit"
         
         # Move focus with mod and arrows
@@ -217,8 +222,8 @@ window#waybar {
         "$mod Ctrl, right, movecurrentworkspacetomonitor, r"
 
         # Switch workspaces relatively 
-        "$mod Super, left, workspace, r-1"
-        "$mod Super, right, workspace, r+1"
+        "$mod Alt, left, workspace, r-1"
+        "$mod Alt, right, workspace, r+1"
         
         # Move active window to workspace relatively 
         "$mod Shift, left, movetoworkspace, r-1"
