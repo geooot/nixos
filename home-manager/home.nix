@@ -148,6 +148,56 @@ window#waybar {
     enable = true;
   };
 
+  programs.hyprlock = {
+    enable = true;
+    package = pkgs.hyprlock;
+    settings = {
+      general = {
+        hide_cursor = false;
+        no_fade_in = true;
+        immediate_render = true;
+      };
+      background = [
+        {
+          monitor = "";
+          color = "#000000";
+        }
+      ];
+      input-field = [
+        {
+          monitor = "DP-3";
+          size = "300, 50";
+          outline_thickness = 1;
+          placeholder_text = "<i>enter password</i>";
+          fade_on_empty = false;
+          font_family = "Berkeley Mono Variable";
+          dots_spacing = 0.2;
+          dots_center = true;
+          position = "0, -200";
+          halign = "center";
+          dots_fade_time = "0";
+          inner_color = "rgba(0,0,0,0)";
+          check_color = "rgba(0,0,0,0)";
+          font_color = "rgb(255,255,255)";
+          rounding = "-1";
+          valign = "center";
+        }
+      ];
+      label = [
+        {
+          monitor = "DP-3";
+          text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
+          color = "#FFFFFF";
+          font_size = 95;
+          font_family = "Berkeley Mono Variable";
+          position = "0, 200";
+          halign = "center";
+          valign = "center";
+        }
+      ];
+    };
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
@@ -185,6 +235,7 @@ window#waybar {
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
       "$menu" = ''${pkgs.rofi-wayland}/bin/rofi -show run -show-icons'';
       "$fileManager" = ''${pkgs.xfce.thunar}/bin/thunar'';
+      "$locker" = ''${pkgs.hyprlock}/bin/hyprlock'';
 
       misc = {
         disable_hyprland_logo = true;
@@ -204,6 +255,7 @@ window#waybar {
       bind = [
         "$mod, Return, exec, $terminal"
         "$mod, Q, killactive"
+        "$mod Ctrl, Q, exec, $locker"
         "$mod, E, exec, $fileManager"
         "$mod, V, togglefloating"
         "$mod, M, fullscreen, 1"
