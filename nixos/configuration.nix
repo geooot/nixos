@@ -179,11 +179,12 @@
   services.tumbler.enable = true; # Thumbnail support for images
   services.greetd = {
     enable = true;
-    settings = { 
-      default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions ${pkgs.hyprland}/share/wayland-sessions";
-        user = "greeter";
+    settings = rec { 
+      initial_session = {
+          command = "${pkgs.hyprland}/bin/Hyprland";
+          user = "george";
       };
+      default_session = initial_session;
     };
   };
   

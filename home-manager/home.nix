@@ -148,6 +148,29 @@ window#waybar {
     enable = true;
   };
 
+  services.hypridle = {
+      enable = true;
+      package = pkgs.hypridle;
+
+      settings = {
+          general = {
+              after_sleep_cmd = "hyprctl dispatch dpms on";
+              lock_cmd = "pidof hyprlock || hyprlock";
+          };
+          listener = [
+              {
+                  timeout = 900;
+                  on-timeout = "loginctl lock-session";
+              }
+              {
+                  timeout = 1200;
+                  on-timeout = "hyprctl dispatch dpms off";
+                  on-resume = "hyprctl dispatch dpms on";
+              }
+          ];
+      };
+  };
+
   programs.hyprlock = {
     enable = true;
     package = pkgs.hyprlock;
