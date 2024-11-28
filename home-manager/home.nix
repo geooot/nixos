@@ -59,6 +59,14 @@
     enable = true;
     clock24 = true;
   };
+  
+  programs.zoxide = {
+      enable = true;
+      enableZshIntegration = true;
+      options = [
+        "--cmd cd"
+      ];
+  };
 
   programs.git = {
     enable = true;
@@ -242,6 +250,9 @@ window#waybar {
 	    resize_on_border = false;
 	    allow_tearing = false;
 	    layout = "dwindle";
+      };
+      input = {
+          sensitivity = -0.5;
       };
       dwindle = {
         pseudotile = true;

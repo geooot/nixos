@@ -79,6 +79,8 @@
     initialPassword = "abc";
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
+      nodejs
+      zoxide
       neovim
       waybar
       alacritty
