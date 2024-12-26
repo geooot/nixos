@@ -42,9 +42,30 @@
         disko.nixosModules.default
         (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
 
-        ./nixos/configuration.nix
+        ./systems/dosa/hardware-configuration.nix
+        ./systems/dosa/configuration.nix
+        ./hyprland/configuration.nix
+        ./plasma6/configuration.nix
+        ./stylix/configuration.nix
+        ./home-manager/configuration.nix
               
-        # inputs.home-manager.nixosModules.default
+        # inputs.impermanence.nixosModules.impermanence
+      ];
+    };
+    nixosConfigurations.appam = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs outputs;};
+      modules = [
+        stylix.nixosModules.stylix
+        # disko.nixosModules.default
+        # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
+
+        ./systems/appam/hardware-configuration.nix
+        ./systems/appam/configuration.nix
+        ./hyprland/configuration.nix
+        ./plasma6/configuration.nix
+        ./stylix/configuration.nix
+        ./home-manager/configuration.nix
+              
         # inputs.impermanence.nixosModules.impermanence
       ];
     };
