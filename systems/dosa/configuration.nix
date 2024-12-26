@@ -2,11 +2,19 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ inputs, outputs, config, system, lib, pkgs, ... }:
+{
+  inputs,
+  outputs,
+  config,
+  system,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports =
-    [ 
+    [
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -82,7 +90,7 @@
       neovim
       waybar
       alacritty
-      firefox 
+      firefox
       rofi-wayland
       dunst
       swww
@@ -103,7 +111,10 @@
   };
 
   # Enable flakes
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -126,7 +137,6 @@
     inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
   ];
 
-  
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -160,22 +170,22 @@
     gamescopeSession.enable = true;
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
-  
+
   services.gvfs.enable = true; # Mount, trash, and other functionalities
   services.tumbler.enable = true; # Thumbnail support for images
   services.greetd = {
     enable = true;
-    settings = rec { 
+    settings = rec {
       initial_session = {
-          command = "${pkgs.hyprland}/bin/Hyprland";
-          user = "george";
+        command = "${pkgs.hyprland}/bin/Hyprland";
+        user = "george";
       };
       default_session = initial_session;
     };
   };
-  
+
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware = {
     graphics.enable = true;
@@ -205,7 +215,7 @@
       open = true;
 
       # Enable the Nvidia settings menu,
-	  # accessible via `nvidia-settings`.
+      # accessible via `nvidia-settings`.
       nvidiaSettings = true;
     };
   };
@@ -215,12 +225,25 @@
   };
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 57621 5900 47984 47989 47990 48010];
+  networking.firewall.allowedTCPPorts = [
+    57621
+    5900
+    47984
+    47989
+    47990
+    48010
+  ];
   networking.firewall.allowedUDPPorts = [
     5353
     5900
-    { from = 47998; to = 48000; }
-    { from = 8000; to = 8010; }
+    {
+      from = 47998;
+      to = 48000;
+    }
+    {
+      from = 8000;
+      to = 8010;
+    }
   ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
@@ -250,4 +273,3 @@
   system.stateVersion = "24.05"; # Did you read the comment?
 
 }
-

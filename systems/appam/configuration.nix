@@ -2,11 +2,16 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ inputs, config, pkgs, ... }:
+{
+  inputs,
+  config,
+  pkgs,
+  ...
+}:
 
 {
   imports =
-    [ 
+    [
     ];
 
   # Bootloader.
@@ -51,7 +56,6 @@
   #   wayland.enable = true;
   # };
 
-
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -67,7 +71,10 @@
   };
 
   # Enable flakes
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   security.rtkit.enable = true;
   services.pipewire = {
@@ -90,9 +97,14 @@
   users.users.george = {
     isNormalUser = true;
     description = "George";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
+    extraGroups = [
+      "networkmanager"
+      "wheel"
     ];
+    packages =
+      with pkgs;
+      [
+      ];
   };
 
   users.defaultUserShell = pkgs.zsh;
@@ -115,7 +127,7 @@
     neovim
     waybar
     alacritty
-    firefox 
+    firefox
     rofi-wayland
     dunst
     swww

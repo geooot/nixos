@@ -6,7 +6,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   # You can import other home-manager modules here
   imports = [
     # If you want to use home-manager modules from other flakes (such as nix-colors):
@@ -59,13 +60,13 @@
     enable = true;
     clock24 = true;
   };
-  
+
   programs.zoxide = {
-      enable = true;
-      enableZshIntegration = true;
-      options = [
-        "--cmd cd"
-      ];
+    enable = true;
+    enableZshIntegration = true;
+    options = [
+      "--cmd cd"
+    ];
   };
 
   programs.git = {
@@ -76,63 +77,63 @@
 
   stylix.targets.waybar.enable = false;
   programs.waybar = {
-      enable = true;
-      settings.main = {
-          layer = "top";
-          position = "top";
-          clock.format = "{:%I:%M %p}";
-          tray.spacing = 8;
-          modules-left = [
-            "hyprland/workspaces"
-          ];
-          modules-center = [
-            "hyprland/window"
-          ];
-          modules-right = [
-            "tray"
-            "clock"
-          ];
-      };
-      style = ''
-* {
-    font-size: 14px;
-    font-family: "Berkeley Mono Variable";
-}
+    enable = true;
+    settings.main = {
+      layer = "top";
+      position = "top";
+      clock.format = "{:%I:%M %p}";
+      tray.spacing = 8;
+      modules-left = [
+        "hyprland/workspaces"
+      ];
+      modules-center = [
+        "hyprland/window"
+      ];
+      modules-right = [
+        "tray"
+        "clock"
+      ];
+    };
+    style = ''
+      * {
+          font-size: 14px;
+          font-family: "Berkeley Mono Variable";
+      }
 
-window#waybar { 
-    background-color: #000000; 
-    color: #ffffff;
-}
+      window#waybar { 
+          background-color: #000000; 
+          color: #ffffff;
+      }
 
-#workspaces {
-    padding: 0;
-}
+      #workspaces {
+          padding: 0;
+      }
 
-#workspaces button {
-	padding: 0px 8px 0px 8px; 
- 	min-width: 1px;
-	color: #888888;
-    border-radius: 0;
-	background-color: #000000;
-    border: 1px solid #323232;
-}
+      #workspaces button {
+      	padding: 0px 8px 0px 8px; 
+       	min-width: 1px;
+      	color: #888888;
+          border-radius: 0;
+      	background-color: #000000;
+          border: 1px solid #323232;
+      }
 
 
-.modules-left, .modules-right, .modules-center {
-  background: #000;
-  margin: 4px;
-}
+      .modules-left, .modules-right, .modules-center {
+        background: #000;
+        margin: 4px;
+      }
 
-#tray {
-  margin-right: 8px;
-}
+      #tray {
+        margin-right: 8px;
+      }
 
-#workspaces button.active { 
-	color: #${config.lib.stylix.colors.yellow};
-	background-color: #000000;
-    border: 1px solid #${config.lib.stylix.colors.yellow};
-}
-      '';
+      #workspaces button.active { 
+      	color: #${config.lib.stylix.colors.yellow};
+      	background-color: #000000;
+          border: 1px solid #${config.lib.stylix.colors.yellow};
+      }
+    '';
   };
 
   programs.zsh = {
@@ -157,26 +158,26 @@ window#waybar {
   };
 
   services.hypridle = {
-      enable = true;
-      package = pkgs.hypridle;
+    enable = true;
+    package = pkgs.hypridle;
 
-      settings = {
-          general = {
-              after_sleep_cmd = "hyprctl dispatch dpms on";
-              lock_cmd = "pidof hyprlock || hyprlock";
-          };
-          listener = [
-              {
-                  timeout = 900;
-                  on-timeout = "loginctl lock-session";
-              }
-              {
-                  timeout = 1200;
-                  on-timeout = "hyprctl dispatch dpms off";
-                  on-resume = "hyprctl dispatch dpms on";
-              }
-          ];
+    settings = {
+      general = {
+        after_sleep_cmd = "hyprctl dispatch dpms on";
+        lock_cmd = "pidof hyprlock || hyprlock";
       };
+      listener = [
+        {
+          timeout = 900;
+          on-timeout = "loginctl lock-session";
+        }
+        {
+          timeout = 1200;
+          on-timeout = "hyprctl dispatch dpms off";
+          on-resume = "hyprctl dispatch dpms on";
+        }
+      ];
+    };
   };
 
   programs.hyprlock = {
@@ -247,19 +248,19 @@ window#waybar {
         gaps_in = 4;
         gaps_out = 4;
 
-	    resize_on_border = false;
-	    allow_tearing = false;
-	    layout = "dwindle";
+        resize_on_border = false;
+        allow_tearing = false;
+        layout = "dwindle";
       };
       input = {
-          sensitivity = -0.5;
+        sensitivity = -0.5;
       };
       dwindle = {
         pseudotile = true;
-	    preserve_split = true;
+        preserve_split = true;
       };
       input = {
-      	kb_layout = "us";
+        kb_layout = "us";
       };
       env = [
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
@@ -273,7 +274,7 @@ window#waybar {
 
       misc = {
         disable_hyprland_logo = true;
-	    disable_splash_rendering = true;
+        disable_splash_rendering = true;
       };
 
       animation = [
@@ -296,13 +297,13 @@ window#waybar {
         "$mod, space, exec, $menu"
         "$mod Alt, P, pseudo" # dwindle
         "$mod, J, togglesplit"
-        
+
         # Move focus with mod and arrows
         "$mod, left, movefocus, l"
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
-        
+
         # Move workspace to monitor 
         "$mod Ctrl, left, movecurrentworkspacetomonitor, l"
         "$mod Ctrl, right, movecurrentworkspacetomonitor, r"
@@ -310,11 +311,11 @@ window#waybar {
         # Switch workspaces relatively 
         "$mod Alt, left, workspace, r-1"
         "$mod Alt, right, workspace, r+1"
-        
+
         # Move active window to workspace relatively 
         "$mod Shift, left, movetoworkspace, r-1"
         "$mod Shift, right, movetoworkspace, r+1"
-        
+
         # Switch workspaces with mod and numbers
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
