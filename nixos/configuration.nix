@@ -88,6 +88,8 @@
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       nodejs
+      yt-dlp
+      pnpm
       zoxide
       neovim
       waybar

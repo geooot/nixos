@@ -247,10 +247,9 @@
       general = {
         gaps_in = 4;
         gaps_out = 4;
-
-        resize_on_border = false;
-        allow_tearing = false;
-        layout = "dwindle";
+	    resize_on_border = false;
+        allow_tearing = true;
+	    layout = "dwindle";
       };
       input = {
         sensitivity = -0.5;
