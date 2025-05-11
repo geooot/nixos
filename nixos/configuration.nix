@@ -88,6 +88,7 @@
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       nodejs
+      pnpm
       yt-dlp
       pnpm
       zoxide
@@ -108,7 +109,6 @@
       btop
       steam
       tmux
-      obsidian
       mpv
       imv
     ];
@@ -240,9 +240,6 @@
       nvidiaSettings = true;
     };
   };
-
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";

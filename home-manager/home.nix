@@ -157,78 +157,89 @@
     enable = true;
   };
 
-  services.hypridle = {
-    enable = true;
-    package = pkgs.hypridle;
+  # services.hypridle = {
+  #   enable = true;
+  #   package = pkgs.hypridle;
+  #
+  #   settings = {
+  #     general = {
+  #       after_sleep_cmd = "hyprctl dispatch dpms on";
+  #       lock_cmd = "pidof hyprlock || hyprlock";
+  #     };
+  #     listener = [
+  #       {
+  #         timeout = 900;
+  #         on-timeout = "loginctl lock-session";
+  #       }
+  #       {
+  #         timeout = 1200;
+  #         on-timeout = "hyprctl dispatch dpms off";
+  #         on-resume = "hyprctl dispatch dpms on";
+  #       }
+  #     ];
+  #   };
+  # };
 
-    settings = {
-      general = {
-        after_sleep_cmd = "hyprctl dispatch dpms on";
-        lock_cmd = "pidof hyprlock || hyprlock";
-      };
-      listener = [
-        {
-          timeout = 900;
-          on-timeout = "loginctl lock-session";
-        }
-        {
-          timeout = 1200;
-          on-timeout = "hyprctl dispatch dpms off";
-          on-resume = "hyprctl dispatch dpms on";
-        }
-      ];
-    };
-  };
-
-  programs.hyprlock = {
-    enable = true;
-    package = pkgs.hyprlock;
-    settings = {
-      general = {
-        hide_cursor = false;
-        no_fade_in = true;
-        immediate_render = true;
-      };
-      background = [
-        {
-          monitor = "";
-          color = "#000000";
-        }
-      ];
-      input-field = [
-        {
-          monitor = "DP-3";
-          size = "300, 50";
-          outline_thickness = 1;
-          placeholder_text = "<i>enter password</i>";
-          fade_on_empty = false;
-          font_family = "Berkeley Mono Variable";
-          dots_spacing = 0.2;
-          dots_center = true;
-          position = "0, -200";
-          halign = "center";
-          dots_fade_time = "0";
-          inner_color = "rgba(0,0,0,0)";
-          check_color = "rgba(0,0,0,0)";
-          font_color = "rgb(255,255,255)";
-          rounding = "-1";
-          valign = "center";
-        }
-      ];
-      label = [
-        {
-          monitor = "DP-3";
-          text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
-          color = "#FFFFFF";
-          font_size = 95;
-          font_family = "Berkeley Mono Variable";
-          position = "0, 200";
-          halign = "center";
-          valign = "center";
-        }
-      ];
-    };
-  };
+  # programs.hyprlock = {
+  #   enable = true;
+  #   package = pkgs.hyprlock;
+  #   settings = {
+  #     general = {
+  #       hide_cursor = false;
+  #       no_fade_in = true;
+  #       immediate_render = true;
+  #     };
+  #     render = {
+  #       explicit_sync = 2;
+  #       explicit_sync_kms = 0;
+  #     };
+  #     opengl = {
+  #       nvidia_anti_flicker = 0;
+  #       force_introspection = 2;
+  #     };
+  #     debug = {
+  #       damage_tracking = 0;
+  #     };
+  #     background = [
+  #       {
+  #         monitor = "";
+  #         color = "#000000";
+  #       }
+  #     ];
+  #     input-field = [
+  #       {
+  #         monitor = "DP-3";
+  #         size = "300, 50";
+  #         outline_thickness = 1;
+  #         placeholder_text = "<i>enter password</i>";
+  #         fade_on_empty = false;
+  #         font_family = "Berkeley Mono Variable";
+  #         dots_spacing = 0.2;
+  #         dots_center = true;
+  #         position = "0, -200";
+  #         halign = "center";
+  #         dots_fade_time = "0";
+  #         inner_color = "rgba(0,0,0,0)";
+  #         check_color = "rgba(0,0,0,0)";
+  #         font_color = "rgb(255,255,255)";
+  #         rounding = "-1";
+  #         valign = "center";
+  #       }
+  #     ];
+  #     label = [
+  #       {
+  #         monitor = "DP-3";
+  #         text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
+  #         color = "#FFFFFF";
+  #         font_size = 95;
+  #         font_family = "Berkeley Mono Variable";
+  #         position = "0, 200";
+  #         halign = "center";
+  #         valign = "center";
+  #       }
+  #     ];
+  #   };
+  # };
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -263,12 +274,18 @@
       };
       env = [
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
+        
+        # nvidia crap
+        "LIBVA_DRIVER_NAME,nvidia"
+        "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+        "ELECTRON_OZONE_PLATFORM_HINT,auto"
+        "NVD_BACKEND,direct"
       ];
 
       "$mod" = "Super";
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
       "$menu" = ''${pkgs.rofi-wayland}/bin/rofi -show run -show-icons'';
-      "$fileManager" = ''${pkgs.xfce.thunar}/bin/thunar'';
+      "$fileManager" = ''${pkgs.kdePackages.dolphin }/bin/dolphin'';
       "$locker" = ''${pkgs.hyprlock}/bin/hyprlock'';
 
       misc = {
@@ -293,6 +310,7 @@
         "$mod, E, exec, $fileManager"
         "$mod, V, togglefloating"
         "$mod, M, fullscreen, 1"
+        "$mod, escape, exit"
         "$mod, space, exec, $menu"
         "$mod Alt, P, pseudo" # dwindle
         "$mod, J, togglesplit"

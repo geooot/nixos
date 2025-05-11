@@ -50,12 +50,6 @@
   # You can disable this if you're only using the Wayland session.
   # services.xserver.enable = true;
 
-  # Enable the KDE Plasma Desktop Environment.
-  # services.displayManager.sddm = {
-  #   enable = true;
-  #   wayland.enable = true;
-  # };
-
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -67,7 +61,10 @@
 
   hardware.graphics = {
     enable = true;
-    extraPackages = [ pkgs.mesa.drivers ];
+    extraPackages = [ 
+      pkgs.mesa.drivers
+      pkgs.nvidia-vaapi-driver
+    ];
   };
 
   # Enable flakes

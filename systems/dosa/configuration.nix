@@ -86,6 +86,7 @@
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       nodejs
+      clonehero
       zoxide
       neovim
       waybar
@@ -99,14 +100,20 @@
       cargo
       neofetch
       discord
-      obs-studio
       blender
       btop
       steam
       tmux
-      obsidian
       mpv
       imv
+      miniserve
+      yt-dlp
+      pnpm
+      obsidian
+      google-chrome
+      kdePackages.falkon
+      kdePackages.kdenlive
+      zed-editor
     ];
   };
 
@@ -135,6 +142,7 @@
     wayvnc
     pavucontrol
     inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
+    pkgs.linuxKernel.packages.linux_zen.xone
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -159,11 +167,6 @@
   programs.zsh.enable = true;
   users.defaultUserShell = pkgs.zsh;
 
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
-
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
@@ -173,18 +176,24 @@
 
   services.gvfs.enable = true; # Mount, trash, and other functionalities
   services.tumbler.enable = true; # Thumbnail support for images
-  services.greetd = {
+  # services.greetd = {
+  #   enable = false;
+  #   settings = rec {
+  #     initial_session = {
+  #       command = "${pkgs.hyprland}/bin/Hyprland";
+  #       user = "george";
+  #     };
+  #     default_session = initial_session;
+  #   };
+  # };
+
+  # Enable the KDE Plasma Desktop Environment.
+  services.displayManager.sddm = {
     enable = true;
-    settings = rec {
-      initial_session = {
-        command = "${pkgs.hyprland}/bin/Hyprland";
-        user = "george";
-      };
-      default_session = initial_session;
-    };
+    wayland.enable = true;
   };
 
-  # Load nvidia driver for Xorg and Wayland
+  # # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware = {
