@@ -51,11 +51,11 @@
   # Enable home-manager and git
   programs.home-manager.enable = true;
 
-  qt = {
-    enable = true;
-    style.name = "Breeze";
-  };
-
+  # qt = {
+  #   enable = true;
+  #   style.name = "Breeze";
+  # };
+  
   programs.tmux = {
     enable = true;
     clock24 = true;
@@ -75,7 +75,7 @@
     userEmail = "george.thayamkery@gmail.com";
   };
 
-  stylix.targets.waybar.enable = false;
+  stylix.targets.waybar.addCss = false;
   programs.waybar = {
     enable = true;
     settings.main = {
@@ -129,9 +129,9 @@
       }
 
       #workspaces button.active { 
-      	color: #${config.lib.stylix.colors.yellow};
+      	color: @base0D;
       	background-color: #000000;
-          border: 1px solid #${config.lib.stylix.colors.yellow};
+          border: 1px solid @base0D;
       }
     '';
   };

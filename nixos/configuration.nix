@@ -150,7 +150,7 @@
     inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
   ];
 
-  stylix.image = /etc/nixos/background.png;
+  stylix.image = ../background.png;
   stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/primer-dark-dimmed.yaml";
   stylix.polarity = "dark";
   stylix.fonts.monospace = {
@@ -211,7 +211,7 @@
   hardware = {
     graphics.enable = true;
     nvidia = {
-      package = config.boot.kernelPackages.nvidiaPackages.production;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
 
       # Modesetting is required.
       modesetting.enable = true;
