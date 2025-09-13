@@ -10,9 +10,8 @@
 }:
 
 {
-  imports =
-    [
-    ];
+  imports = [
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -61,7 +60,7 @@
 
   hardware.graphics = {
     enable = true;
-    extraPackages = [ 
+    extraPackages = [
       pkgs.mesa.drivers
       pkgs.nvidia-vaapi-driver
     ];
@@ -98,10 +97,8 @@
       "networkmanager"
       "wheel"
     ];
-    packages =
-      with pkgs;
-      [
-      ];
+    packages = with pkgs; [
+    ];
   };
 
   users.defaultUserShell = pkgs.zsh;

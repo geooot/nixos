@@ -55,7 +55,7 @@
   #   enable = true;
   #   style.name = "Breeze";
   # };
-  
+
   programs.tmux = {
     enable = true;
     clock24 = true;
@@ -151,6 +151,26 @@
 
   programs.rofi = {
     enable = true;
+    plugins = with pkgs; [
+      rofimoji
+    ];
+    terminal = "${pkgs.alacritty}/bin/alacritty";
+    package = pkgs.rofi-wayland;
+    extraConfig = {
+      combi-modi = "window,drun";
+      cycle = true;
+      display-window = "Window";
+      display-combi = ">";
+      display-drun = "Launch";
+      dpi = 144;
+      disable-history = false;
+      drun-display-format = "{icon} {name}";
+      modi = "window,drun";
+      show-icons = true;
+      sidebar-mode = true;
+      sort = true;
+      ssh-client = "ssh";
+    };
   };
 
   programs.alacritty = {
@@ -274,7 +294,7 @@
       };
       env = [
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
-        
+
         # nvidia crap
         "LIBVA_DRIVER_NAME,nvidia"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
@@ -284,8 +304,8 @@
 
       "$mod" = "Super";
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
-      "$menu" = ''${pkgs.rofi-wayland}/bin/rofi -show run -show-icons'';
-      "$fileManager" = ''${pkgs.kdePackages.dolphin }/bin/dolphin'';
+      "$menu" = ''${config.programs.rofi.package}/bin/rofi -show combi -show-icons'';
+      "$fileManager" = ''${pkgs.kdePackages.dolphin}/bin/dolphin'';
       "$locker" = ''${pkgs.hyprlock}/bin/hyprlock'';
 
       misc = {
@@ -321,15 +341,15 @@
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
 
-        # Move workspace to monitor 
+        # Move workspace to monitor
         "$mod Ctrl, left, movecurrentworkspacetomonitor, l"
         "$mod Ctrl, right, movecurrentworkspacetomonitor, r"
 
-        # Switch workspaces relatively 
+        # Switch workspaces relatively
         "$mod Alt, left, workspace, r-1"
         "$mod Alt, right, workspace, r+1"
 
-        # Move active window to workspace relatively 
+        # Move active window to workspace relatively
         "$mod Shift, left, movetoworkspace, r-1"
         "$mod Shift, right, movetoworkspace, r+1"
 

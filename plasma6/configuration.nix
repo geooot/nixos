@@ -6,7 +6,7 @@
   xdg.portal.enable = true;
   xdg.portal.xdgOpenUsePortal = true;
   xdg.portal.extraPortals = [
-    pkgs.kdePackages.xdg-desktop-portal-kde 
+    pkgs.kdePackages.xdg-desktop-portal-kde
     pkgs.xdg-desktop-portal-gtk
   ];
 
