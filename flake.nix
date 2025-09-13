@@ -84,6 +84,25 @@
           # inputs.impermanence.nixosModules.impermanence
         ];
       };
+      nixosConfigurations.vada = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs outputs;
+        };
+        modules = [
+          stylix.nixosModules.stylix
+          # disko.nixosModules.default
+          # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
+
+          ./systems/vada/hardware-configuration.nix
+          ./systems/vada/configuration.nix
+          ./hyprland/configuration.nix
+          ./plasma6/configuration.nix
+          ./stylix/configuration.nix
+          ./home-manager/configuration.nix
+
+          # inputs.impermanence.nixosModules.impermanence
+        ];
+      };
       formatter.aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style;
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
     };

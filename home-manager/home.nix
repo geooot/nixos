@@ -267,6 +267,7 @@
       monitor = [
         "DP-3,2560x1440,0x0,1"
         "DP-1,2560x1440,2560x0,1"
+        "eDP-1,,,1"
       ];
       exec-once = [
         ''${pkgs.wayvnc}/bin/wayvnc -g''
