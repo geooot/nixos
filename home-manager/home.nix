@@ -94,9 +94,9 @@
         "battery"
         "clock"
       ];
-	battery= {
-		format = "{capacity}%";
-	};
+      battery = {
+        format = "{capacity}%";
+      };
     };
     style = ''
       * {
@@ -304,7 +304,7 @@
       input = {
         kb_layout = "us";
       };
-      bindle=[
+      bindle = [
         '', XF86AudioRaiseVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+''
         '', XF86AudioLowerVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-''
       ];

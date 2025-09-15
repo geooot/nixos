@@ -1,4 +1,3 @@
-
 { config, pkgs, ... }:
 
 {
@@ -10,7 +9,9 @@
     config.modmap = [
       {
         name = "Global";
-	remap = {"CapsLock"= "Esc";};
+        remap = {
+          "CapsLock" = "Esc";
+        };
       }
     ];
   };

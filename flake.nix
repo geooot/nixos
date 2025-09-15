@@ -103,8 +103,8 @@
           stylix.nixosModules.stylix
           # disko.nixosModules.default
           # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
-	  xremap-flake.nixosModules.default
-	  ./xremap/configuration.nix
+          xremap-flake.nixosModules.default
+          ./xremap/configuration.nix
           ./systems/vada/hardware-configuration.nix
           ./systems/vada/configuration.nix
           ./hyprland/configuration.nix

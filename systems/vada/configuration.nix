@@ -5,9 +5,8 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [
-    ];
+  imports = [
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -80,7 +79,10 @@
   users.users.george = {
     isNormalUser = true;
     description = "George Thayamkery";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [
       kdePackages.kate
       obsidian
@@ -89,7 +91,7 @@
       vesktop
       blender
       clonehero
-    #  thunderbird
+      #  thunderbird
     ];
   };
 
@@ -116,7 +118,10 @@
     maliit-keyboard
   ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Enable the OpenSSH daemon.
   services.openssh = {
