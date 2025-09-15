@@ -83,9 +83,17 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       kdePackages.kate
+      obsidian
+      spotify
+      mpv
+      vesktop
+      blender
+      clonehero
     #  thunderbird
     ];
   };
+
+  services.fwupd.enable = true;
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -99,9 +107,38 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
+    neovim
+    fzf
+    ripgrep
+    btop
+    pavucontrol
+    zoxide
+    maliit-keyboard
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Enable the OpenSSH daemon.
+  services.openssh = {
+    enable = true;
+    settings = {
+      PermitRootLogin = "no";
+      PasswordAuthentication = true;
+    };
+  };
+
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
+
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    gamescopeSession.enable = true;
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+
+  services.gvfs.enable = true; # Mount, trash, and other functionalities
+  services.tumbler.enable = true; # Thumbnail support for images
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -20,6 +20,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+    };
+
+    xremap-flake = {
+      url = "github:xremap/nix-flake";
+    };
+
     # Private flakes
     fontpkgs = {
       url = "git+file:///home/george/github.com/geooot/fonts";
@@ -39,6 +47,8 @@
       nixpkgs,
       disko,
       fontpkgs,
+      nixos-hardware,
+      xremap-flake,
       ...
     }@inputs:
     let
@@ -89,10 +99,12 @@
           inherit inputs outputs;
         };
         modules = [
+          nixos-hardware.nixosModules.framework-12-13th-gen-intel
           stylix.nixosModules.stylix
           # disko.nixosModules.default
           # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
-
+	  xremap-flake.nixosModules.default
+	  ./xremap/configuration.nix
           ./systems/vada/hardware-configuration.nix
           ./systems/vada/configuration.nix
           ./hyprland/configuration.nix

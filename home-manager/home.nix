@@ -91,8 +91,12 @@
       ];
       modules-right = [
         "tray"
+        "battery"
         "clock"
       ];
+	battery= {
+		format = "{capacity}%";
+	};
     };
     style = ''
       * {
@@ -124,7 +128,7 @@
         margin: 4px;
       }
 
-      #tray {
+      #tray, #battery {
         margin-right: 8px;
       }
 
@@ -267,7 +271,7 @@
       monitor = [
         "DP-3,2560x1440,0x0,1"
         "DP-1,2560x1440,2560x0,1"
-        "eDP-1,,,1"
+        ",preferred,auto,1.25"
       ];
       exec-once = [
         ''${pkgs.wayvnc}/bin/wayvnc -g''
@@ -284,7 +288,14 @@
         layout = "dwindle";
       };
       input = {
-        sensitivity = -0.5;
+        sensitivity = 0;
+        touchpad = {
+          natural_scroll = true;
+        };
+      };
+      device = {
+        name = "pixa38454:00-093a:0239-touchpad";
+        sensitivity = 0;
       };
       dwindle = {
         pseudotile = true;
@@ -293,6 +304,10 @@
       input = {
         kb_layout = "us";
       };
+      bindle=[
+        '', XF86AudioRaiseVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+''
+        '', XF86AudioLowerVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-''
+      ];
       env = [
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
 
