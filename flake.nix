@@ -15,6 +15,10 @@
     #   url = "github:nix-community/impermanence";
     # };
 
+    apple-fonts = {
+      url = "github:Lyndeno/apple-fonts.nix";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

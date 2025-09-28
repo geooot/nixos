@@ -291,6 +291,8 @@
         sensitivity = 0;
         touchpad = {
           natural_scroll = true;
+	  scroll_factor = 0.7;
+	  clickfinger_behavior = 1;
         };
       };
       device = {
@@ -318,7 +320,8 @@
         "NVD_BACKEND,direct"
       ];
 
-      "$mod" = "Super";
+      "$mod" = "Ctrl";
+      "$mod_alt" = "Super";
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
       "$menu" = ''${config.programs.rofi.package}/bin/rofi -show combi -show-icons'';
       "$fileManager" = ''${pkgs.kdePackages.dolphin}/bin/dolphin'';
@@ -342,9 +345,9 @@
       bind = [
         "$mod, Return, exec, $terminal"
         "$mod, Q, killactive"
-        "$mod Ctrl, Q, exec, $locker"
+        "$mod $mod_alt, Q, exec, $locker"
         "$mod, E, exec, $fileManager"
-        "$mod, V, togglefloating"
+        "$mod, B, togglefloating"
         "$mod, M, fullscreen, 1"
         "$mod, escape, exit"
         "$mod, space, exec, $menu"
@@ -358,8 +361,8 @@
         "$mod, down, movefocus, d"
 
         # Move workspace to monitor
-        "$mod Ctrl, left, movecurrentworkspacetomonitor, l"
-        "$mod Ctrl, right, movecurrentworkspacetomonitor, r"
+        "$mod $mod_alt, left, movecurrentworkspacetomonitor, l"
+        "$mod $mod_alt, right, movecurrentworkspacetomonitor, r"
 
         # Switch workspaces relatively
         "$mod Alt, left, workspace, r-1"
