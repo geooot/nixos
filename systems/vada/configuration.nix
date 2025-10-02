@@ -44,8 +44,18 @@
   # You can disable this if you're only using the Wayland session.
   services.xserver.enable = false;
 
-  # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
+  # Enable the ly window manager.
+  services.displayManager.ly = {
+    enable = true;
+    settings = {
+      animate = true;
+      animation = "colormix";
+      hide_borders = true;
+      clock = "%c";
+      bigclock = true;
+      bigclock_12hr = true;
+    };
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -71,6 +81,21 @@
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
+
+  # services.auto-cpufreq = {
+  #   enable = true;
+  #   settings = {
+  #     charger = {
+  #       governor = "performance";
+  #       turbo = "auto";
+  #     };
+  #
+  #     battery = {
+  #       governor = "powersave";
+  #       turbo = "auto";
+  #     };
+  #   };
+  # };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;

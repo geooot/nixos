@@ -12,7 +12,7 @@
   stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
   stylix.polarity = "dark";
 
-  stylix.fonts.serif = {
+  stylix.fonts.sansSerif = {
     package = inputs.apple-fonts.packages.x86_64-linux.sf-pro-nerd;
     name = "SFProDisplay Nerd Font";
   };

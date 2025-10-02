@@ -112,6 +112,7 @@
           ./systems/vada/hardware-configuration.nix
           ./systems/vada/configuration.nix
           ./hyprland/configuration.nix
+          ./obs/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix

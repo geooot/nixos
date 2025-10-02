@@ -159,7 +159,7 @@
       rofimoji
     ];
     terminal = "${pkgs.alacritty}/bin/alacritty";
-    package = pkgs.rofi-wayland;
+    package = pkgs.rofi;
     extraConfig = {
       combi-modi = "window,drun";
       cycle = true;
@@ -265,13 +265,21 @@
   #   };
   # };
 
+  home.pointerCursor = {
+    package = pkgs.posy-cursors;
+    name = "Posy_Cursor_Black";
+    size = 24;
+    gtk.enable = true;
+    x11.enable = true;
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
       monitor = [
         "DP-3,2560x1440,0x0,1"
         "DP-1,2560x1440,2560x0,1"
-        ",preferred,auto,1.25"
+        ",preferred,auto,1"
       ];
       exec-once = [
         ''${pkgs.wayvnc}/bin/wayvnc -g''
@@ -279,6 +287,7 @@
         ''${pkgs.swww}/bin/swww-daemon''
         ''${pkgs.dunst}/bin/dunst''
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+	"hyprctl setcursor Posy_Cursor_Black 24"
       ];
       general = {
         gaps_in = 4;
@@ -291,7 +300,7 @@
         sensitivity = 0;
         touchpad = {
           natural_scroll = true;
-	  scroll_factor = 0.7;
+	  scroll_factor = 0.3;
 	  clickfinger_behavior = 1;
         };
       };
@@ -309,6 +318,8 @@
       bindle = [
         '', XF86AudioRaiseVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+''
         '', XF86AudioLowerVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-''
+        '', XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%+''
+        '', XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-''
       ];
       env = [
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
