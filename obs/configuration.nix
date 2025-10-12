@@ -10,7 +10,7 @@
 
     plugins = [
       pkgs.obs-studio-plugins.wlrobs
-      pkgs.obs-studio-plugins.obs-ndi
+      pkgs.obs-studio-plugins.distroav
       pkgs.obs-studio-plugins.obs-vkcapture
     ];
   };

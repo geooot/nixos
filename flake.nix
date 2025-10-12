@@ -30,16 +30,27 @@
 
     xremap-flake = {
       url = "github:xremap/nix-flake";
+      inputs.hyprland.follows = "hyprland";
+    };
+
+    rose-pine-hyprcursor = {
+      url = "github:ndom91/rose-pine-hyprcursor";
+    };
+
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    hyprgrass = {
+      url = "github:horriblename/hyprgrass";
+      inputs.hyprland.follows = "hyprland";
     };
 
     # Private flakes
     fontpkgs = {
       url = "git+file:///home/george/github.com/geooot/fonts";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    rose-pine-hyprcursor = {
-      url = "github:ndom91/rose-pine-hyprcursor";
     };
 
   };
@@ -107,11 +118,11 @@
           stylix.nixosModules.stylix
           # disko.nixosModules.default
           # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
+          ./hyprland/configuration.nix
           xremap-flake.nixosModules.default
           ./xremap/configuration.nix
           ./systems/vada/hardware-configuration.nix
           ./systems/vada/configuration.nix
-          ./hyprland/configuration.nix
           ./obs/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix

@@ -275,6 +275,13 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
+    package = inputs.hyprland.packages.${pkgs.system}.default;
+    plugins = [
+      inputs.hyprgrass.packages.${pkgs.system}.default
+
+      # optional integration with pulse-audio, see examples/hyprgrass-pulse/README.md
+      inputs.hyprgrass.packages.${pkgs.system}.hyprgrass-pulse
+    ];
     settings = {
       monitor = [
         "DP-3,2560x1440,0x0,1"
@@ -286,8 +293,9 @@
         ''${pkgs.waybar}/bin/waybar''
         ''${pkgs.swww}/bin/swww-daemon''
         ''${pkgs.dunst}/bin/dunst''
+	''${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300''
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-	"hyprctl setcursor Posy_Cursor_Black 24"
+        "hyprctl setcursor Posy_Cursor_Black 24"
       ];
       general = {
         gaps_in = 4;
@@ -300,9 +308,12 @@
         sensitivity = 0;
         touchpad = {
           natural_scroll = true;
-	  scroll_factor = 0.3;
-	  clickfinger_behavior = 1;
+          scroll_factor = 0.3;
+          clickfinger_behavior = 1;
         };
+      };
+      gestures = {
+        workspace_swipe_cancel_ratio = 0.15;
       };
       device = {
         name = "pixa38454:00-093a:0239-touchpad";
@@ -330,6 +341,52 @@
         "ELECTRON_OZONE_PLATFORM_HINT,auto"
         "NVD_BACKEND,direct"
       ];
+      gesture = [
+        "3, horizontal, scale:0.9, workspace"
+      ];
+      plugin = {
+        touch_gestures = {
+          # The default sensitivity is probably too low on tablet screens,
+          # I recommend turning it up to 4.0
+          sensitivity = 4.0;
+
+          # must be >= 3
+          workspace_swipe_fingers = 3;
+
+          # switching workspaces by swiping from an edge, this is separate from workspace_swipe_fingers
+          # and can be used at the same time
+          # possible values: l, r, u, or d
+          # to disable it set it to anything else
+          workspace_swipe_edge = "d";
+
+          # in milliseconds
+          long_press_delay = 400;
+
+          # resize windows by long-pressing on window borders and gaps.
+          # If general:resize_on_border is enabled, general:extend_border_grab_area is used for floating
+          # windows
+          resize_on_border_long_press = true;
+
+          # in pixels, the distance from the edge that is considered an edge
+          edge_margin = 20;
+
+          # emulates touchpad swipes when swiping in a direction that does not trigger workspace swipe.
+          # ONLY triggers when finger count is equal to workspace_swipe_fingers
+          #
+          # might be removed in the future in favor of event hooks
+          emulate_touchpad_swipe = false;
+
+	  hyprgrass-bind = [
+	    ",edge:d:u,exec,kill -34 $(ps -C wvkbd-mobintl -o pid | grep -v PID)"
+	  ];
+
+          experimental = {
+            # send proper cancel events to windows instead of hacky touch_up events,
+            # NOT recommended as it crashed a few times, once it's stabilized I'll make it the default
+            send_cancel = 0;
+          };
+        };
+      };
 
       "$mod" = "Ctrl";
       "$mod_alt" = "Super";

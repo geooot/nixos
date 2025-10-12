@@ -11,10 +11,11 @@
         name = "Global";
         remap = {
           "CapsLock" = "Esc";
-	  "Alt_L" = "Ctrl_L";
-	  "Ctrl_L" = "Alt_L";
+          "Alt_L" = "Ctrl_L";
+          "Ctrl_L" = "Alt_L";
         };
       }
     ];
   };
 }
+
