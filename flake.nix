@@ -82,6 +82,7 @@
           ./systems/dosa/hardware-configuration.nix
           ./systems/dosa/configuration.nix
           ./hyprland/configuration.nix
+          ./sunshine/configuration.nix
           ./obs/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
@@ -119,6 +120,7 @@
           # disko.nixosModules.default
           # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
           ./hyprland/configuration.nix
+          ./sunshine/configuration.nix
           xremap-flake.nixosModules.default
           ./xremap/configuration.nix
           ./systems/vada/hardware-configuration.nix
