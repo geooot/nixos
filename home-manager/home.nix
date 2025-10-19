@@ -388,8 +388,8 @@
         };
       };
 
-      "$mod" = "Ctrl";
-      "$mod_alt" = "Super";
+      "$mod" = "Super";
+      "$mod_alt" = "Shift";
       "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
       "$menu" = ''${config.programs.rofi.package}/bin/rofi -show combi -show-icons'';
       "$fileManager" = ''${pkgs.kdePackages.dolphin}/bin/dolphin'';
@@ -419,7 +419,7 @@
         "$mod, M, fullscreen, 1"
         "$mod, escape, exit"
         "$mod, space, exec, $menu"
-        "$mod Alt, P, pseudo" # dwindle
+        "$mod $mod_alt, P, pseudo" # dwindle
         "$mod, J, togglesplit"
 
         # Move focus with mod and arrows
@@ -433,12 +433,12 @@
         "$mod $mod_alt, right, movecurrentworkspacetomonitor, r"
 
         # Switch workspaces relatively
-        "$mod Alt, left, workspace, r-1"
-        "$mod Alt, right, workspace, r+1"
+        "$mod $mod_alt, left, workspace, r-1"
+        "$mod $mod_alt, right, workspace, r+1"
 
         # Move active window to workspace relatively
-        "$mod Shift, left, movetoworkspace, r-1"
-        "$mod Shift, right, movetoworkspace, r+1"
+        "$mod Alt, left, movetoworkspace, r-1"
+        "$mod Alt, right, movetoworkspace, r+1"
 
         # Switch workspaces with mod and numbers
         "$mod, 1, workspace, 1"
@@ -453,16 +453,16 @@
         "$mod, 0, workspace, 0"
 
         # Move active window to a workspace
-        "$mod SHIFT, 1, movetoworkspace, 1"
-        "$mod SHIFT, 2, movetoworkspace, 2"
-        "$mod SHIFT, 3, movetoworkspace, 3"
-        "$mod SHIFT, 4, movetoworkspace, 4"
-        "$mod SHIFT, 5, movetoworkspace, 5"
-        "$mod SHIFT, 6, movetoworkspace, 6"
-        "$mod SHIFT, 7, movetoworkspace, 7"
-        "$mod SHIFT, 8, movetoworkspace, 8"
-        "$mod SHIFT, 9, movetoworkspace, 9"
-        "$mod SHIFT, 0, movetoworkspace, 0"
+        "$mod Alt, 1, movetoworkspace, 1"
+        "$mod Alt, 2, movetoworkspace, 2"
+        "$mod Alt, 3, movetoworkspace, 3"
+        "$mod Alt, 4, movetoworkspace, 4"
+        "$mod Alt, 5, movetoworkspace, 5"
+        "$mod Alt, 6, movetoworkspace, 6"
+        "$mod Alt, 7, movetoworkspace, 7"
+        "$mod Alt, 8, movetoworkspace, 8"
+        "$mod Alt, 9, movetoworkspace, 9"
+        "$mod Alt, 0, movetoworkspace, 0"
       ];
     };
   };
