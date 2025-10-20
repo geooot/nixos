@@ -416,7 +416,7 @@
         "$mod, Q, killactive"
         "$mod $mod_alt, Q, exec, $locker"
         "$mod, E, exec, $fileManager"
-        "$mod, B, togglefloating"
+        "$mod $mod_alt, B, togglefloating"
         "$mod, M, fullscreen, 1"
         "$mod, escape, exit"
         "$mod, space, exec, $menu"
