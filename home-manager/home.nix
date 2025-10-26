@@ -146,6 +146,7 @@
     enableCompletion = true;
     shellAliases = {
       vim = "nvim";
+      wifi = "nmtui";
     };
     oh-my-zsh = {
       enable = true;
