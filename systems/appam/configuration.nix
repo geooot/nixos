@@ -122,7 +122,7 @@
     waybar
     alacritty
     firefox
-    rofi-wayland
+    rofi
     dunst
     swww
     libnotify

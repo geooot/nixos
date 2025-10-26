@@ -84,7 +84,7 @@
       waybar
       alacritty
       firefox
-      rofi-wayland
+      rofi
       dunst
       swww
       libnotify
@@ -191,7 +191,7 @@
   hardware = {
     graphics.enable = true;
     nvidia = {
-      package = config.boot.kernelPackages.nvidiaPackages.production;
+      package = config.boot.kernelPackages.nvidiaPackages.beta;
 
       # Modesetting is required.
       modesetting.enable = true;
