@@ -71,8 +71,11 @@
 
   programs.git = {
     enable = true;
-    userName = "George Thayamkery";
-    userEmail = "george.thayamkery@gmail.com";
+    settings = {
+      user.name = "George Thayamkery";
+      user.email = "george.thayamkery@gmail.com";
+      core.editor = "vim";
+    };
   };
 
   stylix.targets.waybar.addCss = false;
