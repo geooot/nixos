@@ -189,77 +189,64 @@
     settings = {
       general = {
         after_sleep_cmd = "hyprctl dispatch dpms on";
+        lock_cmd = "pidof hyprlock || hyprlock";
       };
       listener = [
         {
-          timeout = 300;
-          on-timeout = "hyprctl dispatch dpms off DP-3";
-          on-resume = "hyprctl dispatch dpms on DP-3";
+          timeout = 600;
+          on-timeout = "loginctl lock-session";
+        }
+        {
+          timeout = 630;
+          on-timeout = "hyprctl dispatch dpms off";
+          on-resume = "hyprctl dispatch dpms on";
         }
       ];
     };
   };
 
-  # programs.hyprlock = {
-  #   enable = true;
-  #   package = pkgs.hyprlock;
-  #   settings = {
-  #     general = {
-  #       hide_cursor = false;
-  #       no_fade_in = true;
-  #       immediate_render = true;
-  #     };
-  #     render = {
-  #       explicit_sync = 2;
-  #       explicit_sync_kms = 0;
-  #     };
-  #     opengl = {
-  #       nvidia_anti_flicker = 0;
-  #       force_introspection = 2;
-  #     };
-  #     debug = {
-  #       damage_tracking = 0;
-  #     };
-  #     background = [
-  #       {
-  #         monitor = "";
-  #         color = "#000000";
-  #       }
-  #     ];
-  #     input-field = [
-  #       {
-  #         monitor = "DP-3";
-  #         size = "300, 50";
-  #         outline_thickness = 1;
-  #         placeholder_text = "<i>enter password</i>";
-  #         fade_on_empty = false;
-  #         font_family = "Berkeley Mono Variable";
-  #         dots_spacing = 0.2;
-  #         dots_center = true;
-  #         position = "0, -200";
-  #         halign = "center";
-  #         dots_fade_time = "0";
-  #         inner_color = "rgba(0,0,0,0)";
-  #         check_color = "rgba(0,0,0,0)";
-  #         font_color = "rgb(255,255,255)";
-  #         rounding = "-1";
-  #         valign = "center";
-  #       }
-  #     ];
-  #     label = [
-  #       {
-  #         monitor = "DP-3";
-  #         text = "cmd[update:1000] echo \"$(date +\"%-I:%M\")\"";
-  #         color = "#FFFFFF";
-  #         font_size = 95;
-  #         font_family = "Berkeley Mono Variable";
-  #         position = "0, 200";
-  #         halign = "center";
-  #         valign = "center";
-  #       }
-  #     ];
-  #   };
-  # };
+  programs.hyprlock = {
+    enable = true;
+    package = pkgs.hyprlock;
+
+    settings = {
+      input-field = {
+        size = "300, 50";
+        outline_thickness = 2;
+        dots_size = 0.2;
+        dots_spacing = 0.3;
+        dots_center = true;
+        fade_on_empty = false;
+        placeholder_text = "<span foreground='##${config.lib.stylix.colors.base04}'>Enter password...</span>";
+        hide_input = false;
+        fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
+        position = "0, -120";
+        halign = "center";
+        valign = "center";
+      };
+
+      label = [
+        {
+          text = ''cmd[update:1000] echo "<b>$(date +"%I:%M %p")</b>"'';
+          color = "rgb(${config.lib.stylix.colors.base05})";
+          font_size = 72;
+          font_family = config.stylix.fonts.sansSerif.name;
+          position = "0, 200";
+          halign = "center";
+          valign = "center";
+        }
+        {
+          text = ''cmd[update:1000] echo "$(date +"%A, %B %d")"'';
+          color = "rgb(${config.lib.stylix.colors.base04})";
+          font_size = 24;
+          font_family = config.stylix.fonts.sansSerif.name;
+          position = "0, 120";
+          halign = "center";
+          valign = "center";
+        }
+      ];
+    };
+  };
 
   home.pointerCursor = {
     package = pkgs.posy-cursors;
@@ -416,10 +403,10 @@
         "$mod, Return, exec, $terminal"
         "$mod, Q, killactive"
         "$mod $mod_alt, Q, exec, $locker"
+        "$mod, escape, exec, $locker"
         "$mod, E, exec, $fileManager"
         "$mod $mod_alt, B, togglefloating"
         "$mod, M, fullscreen, 1"
-        "$mod, escape, exit"
         "$mod, space, exec, $menu"
         "$mod $mod_alt, P, pseudo" # dwindle
         "$mod, J, togglesplit"
