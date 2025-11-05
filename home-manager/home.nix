@@ -181,6 +181,28 @@
     };
   };
 
+  home.file.".local/share/applications/nmtui.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Wifi Configuration
+    Comment=Manage network connections
+    Exec=${pkgs.alacritty}/bin/alacritty --class floating-tui -e ${pkgs.networkmanager}/bin/nmtui
+    Terminal=false
+    Categories=Network;Settings;
+    Icon=network-wired
+  '';
+
+  home.file.".local/share/applications/bluetui.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Bluetooth Configuration
+    Comment=Manage bluetooth connections
+    Exec=${pkgs.alacritty}/bin/alacritty --class floating-tui -e ${pkgs.bluetui}/bin/bluetui
+    Terminal=false
+    Categories=Network;Settings;
+    Icon=bluetooth
+  '';
+
   programs.alacritty = {
     enable = true;
   };
@@ -391,6 +413,12 @@
         disable_splash_rendering = true;
 	vfr = true;
       };
+
+      windowrulev2 = [
+        "float, class:^(floating-tui)$"
+        "size 800 600, class:^(floating-tui)$"
+        "center, class:^(floating-tui)$"
+      ];
 
       animation = [
         "global, 1, 1, default"
