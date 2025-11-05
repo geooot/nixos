@@ -47,6 +47,11 @@
       inputs.hyprland.follows = "hyprland";
     };
 
+    gt-nvim = {
+      url = "github:geooot/gt-nix-cats-nvim-config";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Private flakes
     fontpkgs = {
       url = "git+file:///home/george/github.com/geooot/fonts";
@@ -64,6 +69,7 @@
       fontpkgs,
       nixos-hardware,
       xremap-flake,
+      gt-nvim,
       ...
     }@inputs:
     let

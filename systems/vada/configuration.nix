@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports = [
@@ -111,6 +111,7 @@
     packages = with pkgs; [
       kdePackages.kate
       obsidian
+      opencode
       spotify
       mpv
       vesktop
@@ -121,6 +122,8 @@
   };
 
   services.fwupd.enable = true;
+
+  hardware.bluetooth.enable = true;
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -134,7 +137,7 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
-    neovim
+    inputs.gt-nvim.packages.${pkgs.system}.default
     fzf
     ripgrep
     btop

@@ -345,6 +345,27 @@
         "type": "github"
       }
     },
+    "gt-nvim": {
+      "inputs": {
+        "nixCats": "nixCats",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762314829,
+        "narHash": "sha256-TF8ccwL7/UX2m4L+ZIOKAxmaxbFjoFYPpL5mnYwiCJU=",
+        "owner": "geooot",
+        "repo": "gt-nix-cats-nvim-config",
+        "rev": "49225f897c2700c461725c020772b11804c444ee",
+        "type": "github"
+      },
+      "original": {
+        "owner": "geooot",
+        "repo": "gt-nix-cats-nvim-config",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -691,6 +712,21 @@
         "type": "github"
       }
     },
+    "nixCats": {
+      "locked": {
+        "lastModified": 1761732732,
+        "narHash": "sha256-AP3KzTaFXFLjWWXysSnVTXUaGuC3hkUQZSlxUdGsLSs=",
+        "owner": "BirdeeHub",
+        "repo": "nixCats-nvim",
+        "rev": "6307455a6ccceadb9f873fc51d4cf7cd39bdace5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BirdeeHub",
+        "repo": "nixCats-nvim",
+        "type": "github"
+      }
+    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1760958188,
@@ -915,6 +951,7 @@
         "apple-fonts": "apple-fonts",
         "disko": "disko",
         "fontpkgs": "fontpkgs",
+        "gt-nvim": "gt-nvim",
         "home-manager": "home-manager",
         "hyprgrass": "hyprgrass",
         "hyprland": "hyprland",

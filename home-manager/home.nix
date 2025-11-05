@@ -287,7 +287,7 @@
       monitor = [
         "DP-3,2560x1440,0x0,1"
         "DP-1,2560x1440,2560x0,1"
-        ",preferred,auto,1"
+        ",preferred,auto,1.2"
       ];
       exec-once = [
         ''${pkgs.wayvnc}/bin/wayvnc -g''
@@ -298,6 +298,9 @@
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "hyprctl setcursor Posy_Cursor_Black 24"
       ];
+      xwayland = {
+        force_zero_scaling = true;
+      };
       general = {
         gaps_in = 4;
         gaps_out = 4;
@@ -308,6 +311,7 @@
       input = {
         sensitivity = 0;
         touchpad = {
+          disable_while_typing = false;
           natural_scroll = true;
           scroll_factor = 0.3;
           clickfinger_behavior = 1;
