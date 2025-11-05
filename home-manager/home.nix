@@ -182,28 +182,23 @@
     enable = true;
   };
 
-  # services.hypridle = {
-  #   enable = true;
-  #   package = pkgs.hypridle;
-  #
-  #   settings = {
-  #     general = {
-  #       after_sleep_cmd = "hyprctl dispatch dpms on";
-  #       lock_cmd = "pidof hyprlock || hyprlock";
-  #     };
-  #     listener = [
-  #       {
-  #         timeout = 900;
-  #         on-timeout = "loginctl lock-session";
-  #       }
-  #       {
-  #         timeout = 1200;
-  #         on-timeout = "hyprctl dispatch dpms off";
-  #         on-resume = "hyprctl dispatch dpms on";
-  #       }
-  #     ];
-  #   };
-  # };
+  services.hypridle = {
+    enable = true;
+    package = pkgs.hypridle;
+
+    settings = {
+      general = {
+        after_sleep_cmd = "hyprctl dispatch dpms on";
+      };
+      listener = [
+        {
+          timeout = 300;
+          on-timeout = "hyprctl dispatch dpms off DP-3";
+          on-resume = "hyprctl dispatch dpms on DP-3";
+        }
+      ];
+    };
+  };
 
   # programs.hyprlock = {
   #   enable = true;
@@ -295,6 +290,7 @@
         ''${pkgs.swww}/bin/swww-daemon''
         ''${pkgs.dunst}/bin/dunst''
 	''${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300''
+        ''${pkgs.hypridle}/bin/hypridle''
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "hyprctl setcursor Posy_Cursor_Black 24"
       ];
