@@ -203,6 +203,34 @@
     Icon=bluetooth
   '';
 
+  home.file.".local/share/applications/powerprofile.desktop".text =
+    let
+      powerProfileScript = pkgs.writeShellScript "powerprofile-selector" ''
+        current=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl list | ${pkgs.gnugrep}/bin/grep "^\*" | ${pkgs.gnused}/bin/sed "s/^\* //" | ${pkgs.gnused}/bin/sed "s/:$//")
+        
+        profile=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl list | \
+          ${pkgs.gnugrep}/bin/grep ":$" | \
+          ${pkgs.gnused}/bin/sed "s/^[ *]*//" | \
+          ${pkgs.gnused}/bin/sed "s/:$//" | \
+          ${pkgs.gawk}/bin/awk -v curr="$current" '{if ($0 == curr) print "● " $0; else print "  " $0}' | \
+          ${config.programs.rofi.package}/bin/rofi -dmenu -p "Power Profile" | \
+          ${pkgs.gnused}/bin/sed "s/^[● ]*//" | \
+          ${pkgs.coreutils}/bin/tr -d " ")
+        
+        [ -n "$profile" ] && ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set "$profile"
+      '';
+    in
+    ''
+      [Desktop Entry]
+      Type=Application
+      Name=Power Profile
+      Comment=Manage power profiles
+      Exec=${powerProfileScript}
+      Terminal=false
+      Categories=System;Settings;
+      Icon=battery
+    '';
+
   programs.alacritty = {
     enable = true;
   };
@@ -235,7 +263,20 @@
     package = pkgs.hyprlock;
 
     settings = {
+      image = {
+        monitor = "";
+        path = "/home/george/Pictures/Good Photos/IMG_0572.jpg";
+        size = 850;
+        rounding = 0;
+        position = "0, 0";
+        halign = "right";
+        valign = "center";
+        reload_time = 30;
+        reload_cmd = ''find "/home/george/Pictures/Good Photos" -type f -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" | shuf -n 1'';
+      };
+
       input-field = {
+        monitor = "";
         size = "300, 50";
         outline_thickness = 2;
         dots_size = 0.2;
@@ -245,27 +286,29 @@
         placeholder_text = "<span foreground='##${config.lib.stylix.colors.base04}'>Enter password...</span>";
         hide_input = false;
         fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
-        position = "0, -120";
+        position = "-600, -120";
         halign = "center";
         valign = "center";
       };
 
       label = [
         {
+          monitor = "";
           text = ''cmd[update:1000] echo "<b>$(date +"%I:%M %p")</b>"'';
           color = "rgb(${config.lib.stylix.colors.base05})";
           font_size = 72;
           font_family = config.stylix.fonts.sansSerif.name;
-          position = "0, 200";
+          position = "-600, 200";
           halign = "center";
           valign = "center";
         }
         {
+          monitor = "";
           text = ''cmd[update:1000] echo "$(date +"%A, %B %d")"'';
           color = "rgb(${config.lib.stylix.colors.base04})";
           font_size = 24;
           font_family = config.stylix.fonts.sansSerif.name;
-          position = "0, 120";
+          position = "-600, 120";
           halign = "center";
           valign = "center";
         }
