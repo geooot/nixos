@@ -471,6 +471,7 @@
       bindm = [
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
+        "$mod $mod_alt, mouse:272, resizewindow"
       ];
 
       bind = [
@@ -479,7 +480,7 @@
         "$mod $mod_alt, Q, exec, $locker"
         "$mod, escape, exec, $locker"
         "$mod, E, exec, $fileManager"
-        "$mod $mod_alt, B, togglefloating"
+        "$mod $mod_alt, M, togglefloating"
         "$mod, M, fullscreen, 1"
         "$mod, space, exec, $menu"
         "$mod $mod_alt, P, pseudo" # dwindle
