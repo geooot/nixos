@@ -353,11 +353,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1762314829,
-        "narHash": "sha256-TF8ccwL7/UX2m4L+ZIOKAxmaxbFjoFYPpL5mnYwiCJU=",
+        "lastModified": 1762826115,
+        "narHash": "sha256-YKojbed2Rv4rqYNmXQuGdxNIps7eRXvCuBjZkilIKjA=",
         "owner": "geooot",
         "repo": "gt-nix-cats-nvim-config",
-        "rev": "49225f897c2700c461725c020772b11804c444ee",
+        "rev": "6b0308fdf454c96f02faca090e7616f79fdfadca",
         "type": "github"
       },
       "original": {

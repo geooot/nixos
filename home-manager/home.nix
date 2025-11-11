@@ -98,7 +98,9 @@
         "clock"
       ];
       battery = {
-        format = "{capacity}%";
+        format = "{icon} {capacity}%";
+        format-charging = "󱐋 {capacity}%";
+        format-icons = ["󰁹"];
       };
     };
     style = ''
@@ -266,13 +268,14 @@
       image = {
         monitor = "";
         path = "/home/george/Pictures/Good Photos/IMG_0572.jpg";
-        size = 850;
+        size = 950;
         rounding = 0;
         position = "0, 0";
+        border_color = "rgb(${config.lib.stylix.colors.base05})";
         halign = "right";
         valign = "center";
         reload_time = 30;
-        reload_cmd = ''find "/home/george/Pictures/Good Photos" -type f -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" | shuf -n 1'';
+        reload_cmd = ''find "/home/george/Pictures/Good Photos" -type f -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.JPG" -o -iname "*.png" | shuf -n 1'';
       };
 
       input-field = {
@@ -286,7 +289,7 @@
         placeholder_text = "<span foreground='##${config.lib.stylix.colors.base04}'>Enter password...</span>";
         hide_input = false;
         fail_text = "<i>$FAIL <b>($ATTEMPTS)</b></i>";
-        position = "-600, -120";
+        position = "-700, -85";
         halign = "center";
         valign = "center";
       };
@@ -298,7 +301,7 @@
           color = "rgb(${config.lib.stylix.colors.base05})";
           font_size = 72;
           font_family = config.stylix.fonts.sansSerif.name;
-          position = "-600, 200";
+          position = "-700, 120";
           halign = "center";
           valign = "center";
         }
@@ -308,9 +311,19 @@
           color = "rgb(${config.lib.stylix.colors.base04})";
           font_size = 24;
           font_family = config.stylix.fonts.sansSerif.name;
-          position = "-600, 120";
+          position = "-700, 50";
           halign = "center";
           valign = "center";
+        }
+        {
+          monitor = "";
+          text = ''cmd[update:5000] battery=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n1); status=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n1); if [ "$status" = "Charging" ]; then echo "󱐋 $battery%"; else echo "󰁹 $battery%"; fi'';
+          color = "rgb(${config.lib.stylix.colors.base05})";
+          font_size = 18;
+          font_family = config.stylix.fonts.sansSerif.name;
+          position = "-20, -20";
+          halign = "right";
+          valign = "top";
         }
       ];
     };
