@@ -38,7 +38,7 @@
     };
 
     hyprland = {
-      url = "github:hyprwm/Hyprland";
+      url = "github:hyprwm/Hyprland/v0.52.1-b";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -133,6 +133,22 @@
           ./systems/vada/configuration.nix
           ./obs/configuration.nix
           ./plasma6/configuration.nix
+          ./stylix/configuration.nix
+          ./home-manager/configuration.nix
+
+          # inputs.impermanence.nixosModules.impermanence
+        ];
+      };
+      nixosConfigurations.idli = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs outputs;
+        };
+        modules = [
+          stylix.nixosModules.stylix
+          ./hardware-configuration.nix
+          disko.nixosModules.default
+          (import ./disko/disko.nix { device = "/dev/sda"; })
+          ./systems/idli/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
 
