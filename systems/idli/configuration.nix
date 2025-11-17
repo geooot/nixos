@@ -54,7 +54,7 @@
   };
 
   services.displayManager.autoLogin = {
-    enable = true;
+    enable = false;
     user = "george";
   };
 
