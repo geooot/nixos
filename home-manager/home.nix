@@ -100,7 +100,7 @@
       battery = {
         format = "{icon} {capacity}%";
         format-charging = "󱐋 {capacity}%";
-        format-icons = ["󰁹"];
+        format-icons = [ "󰁹" ];
       };
     };
     style = ''
@@ -151,7 +151,7 @@
     enableCompletion = true;
     shellAliases = {
       vim = "nvim";
-      wifi = "nmtui";
+      wifi = ''${pkgs.networkmanager}/bin/nmtui'';
     };
     oh-my-zsh = {
       enable = true;
@@ -209,7 +209,7 @@
     let
       powerProfileScript = pkgs.writeShellScript "powerprofile-selector" ''
         current=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl list | ${pkgs.gnugrep}/bin/grep "^\*" | ${pkgs.gnused}/bin/sed "s/^\* //" | ${pkgs.gnused}/bin/sed "s/:$//")
-        
+
         profile=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl list | \
           ${pkgs.gnugrep}/bin/grep ":$" | \
           ${pkgs.gnused}/bin/sed "s/^[ *]*//" | \
@@ -218,7 +218,7 @@
           ${config.programs.rofi.package}/bin/rofi -dmenu -p "Power Profile" | \
           ${pkgs.gnused}/bin/sed "s/^[● ]*//" | \
           ${pkgs.coreutils}/bin/tr -d " ")
-        
+
         [ -n "$profile" ] && ${pkgs.power-profiles-daemon}/bin/powerprofilesctl set "$profile"
       '';
     in
@@ -357,7 +357,7 @@
         ''${pkgs.waybar}/bin/waybar''
         ''${pkgs.swww}/bin/swww-daemon''
         ''${pkgs.dunst}/bin/dunst''
-	''${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300''
+        ''${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300''
         ''${pkgs.hypridle}/bin/hypridle''
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "hyprctl setcursor Posy_Cursor_Black 24"
@@ -445,9 +445,9 @@
           # might be removed in the future in favor of event hooks
           emulate_touchpad_swipe = false;
 
-	  hyprgrass-bind = [
-	    ",edge:d:u,exec,kill -34 $(ps -C wvkbd-mobintl -o pid | grep -v PID)"
-	  ];
+          hyprgrass-bind = [
+            ",edge:d:u,exec,kill -34 $(ps -C wvkbd-mobintl -o pid | grep -v PID)"
+          ];
 
           experimental = {
             # send proper cancel events to windows instead of hacky touch_up events,
@@ -467,7 +467,7 @@
       misc = {
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
-	vfr = true;
+        vfr = true;
       };
 
       windowrulev2 = [
