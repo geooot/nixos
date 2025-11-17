@@ -49,17 +49,8 @@
   # You can disable this if you're only using the Wayland session.
   services.xserver.enable = false;
 
-  # Enable the ly window manager.
-  services.displayManager.ly = {
+  services.displayManager.gdm = {
     enable = true;
-    settings = {
-      animate = true;
-      animation = "colormix";
-      hide_borders = true;
-      clock = "%c";
-      bigclock = true;
-      bigclock_12hr = true;
-    };
   };
 
   services.displayManager.autoLogin = {
