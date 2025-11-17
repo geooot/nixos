@@ -145,7 +145,7 @@
         };
         modules = [
           stylix.nixosModules.stylix
-          ./hardware-configuration.nix
+          ./systems/idli/hardware-configuration.nix
           disko.nixosModules.default
           (import ./disko/disko.nix { device = "/dev/sda"; })
           ./systems/idli/configuration.nix

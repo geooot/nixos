@@ -2,7 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -91,17 +96,24 @@
   users.users.george = {
     isNormalUser = true;
     description = "George Thayamkery";
+    initialPassword = "changeme";
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
     packages = with pkgs; [
     ];
+
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGu3yqZ4/3sr61iTJVsGJL0sh7WjNyBTuxwIu4GlT/7b george@dosa"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEKrKxEmplirvKi6W/L99++QDnGGF51KjoZnRKeiOyXj george@nixos"
+    ];
+
   };
 
   users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGu3yqZ4/3sr61iTJVsGJL0sh7WjNyBTuxwIu4GlT/7b george@dosa" 
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEKrKxEmplirvKi6W/L99++QDnGGF51KjoZnRKeiOyXj george@vada"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGu3yqZ4/3sr61iTJVsGJL0sh7WjNyBTuxwIu4GlT/7b george@dosa"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEKrKxEmplirvKi6W/L99++QDnGGF51KjoZnRKeiOyXj george@nixos"
   ];
 
   # Allow unfree packages
