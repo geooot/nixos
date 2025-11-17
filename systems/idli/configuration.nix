@@ -91,10 +91,6 @@
     #media-session.enable = true;
   };
 
-  services.cec = {
-    enable = true;
-  };
-
   # services.auto-cpufreq = {
   #   enable = true;
   #   settings = {
