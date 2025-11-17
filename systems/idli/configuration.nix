@@ -91,6 +91,10 @@
     #media-session.enable = true;
   };
 
+  services.cec = {
+    enable = true;
+  };
+
   # services.auto-cpufreq = {
   #   enable = true;
   #   settings = {
@@ -150,6 +154,8 @@
     zoxide
     maliit-keyboard
     clonehero
+    libcec
+    cec-client
   ];
 
   nix.settings.experimental-features = [
