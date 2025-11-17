@@ -68,6 +68,9 @@
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
+  hardware.xone.enable = true;
+  hardware.xpadneo.enable = true;
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
