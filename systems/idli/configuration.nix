@@ -49,6 +49,32 @@
   # You can disable this if you're only using the Wayland session.
   services.xserver.enable = false;
 
+  # Enable the ly window manager.
+  services.displayManager.ly = {
+    enable = true;
+    settings = {
+      animate = true;
+      animation = "colormix";
+      hide_borders = true;
+      clock = "%c";
+      bigclock = true;
+      bigclock_12hr = true;
+    };
+  };
+
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "george";
+  };
+
+  # Enable steam with its own session
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    gamescopeSession.enable = true;
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -132,6 +158,7 @@
     pavucontrol
     zoxide
     maliit-keyboard
+    clonehero
   ];
 
   nix.settings.experimental-features = [
