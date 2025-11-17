@@ -58,7 +58,7 @@
     user = "george";
   };
 
-  services.displayManager.defaultSession = "gamescope-wayland";
+  services.displayManager.defaultSession = "steam";
 
   # Enable steam with its own session
   programs.steam = {
