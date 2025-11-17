@@ -54,9 +54,11 @@
   };
 
   services.displayManager.autoLogin = {
-    enable = false;
+    enable = true;
     user = "george";
   };
+
+  services.displayManager.defaultSession = "gamescope-wayland";
 
   # Enable steam with its own session
   programs.steam = {
