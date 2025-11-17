@@ -150,8 +150,6 @@
     zoxide
     maliit-keyboard
     clonehero
-    libcec
-    cec-client
   ];
 
   nix.settings.experimental-features = [
