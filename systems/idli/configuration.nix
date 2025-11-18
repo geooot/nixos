@@ -160,7 +160,7 @@
     maliit-keyboard
     clonehero
     libcec
-    cec-ctl
+    v4l-utils
   ];
 
   nix.settings.experimental-features = [
