@@ -164,7 +164,7 @@
     plugins = with pkgs; [
       rofimoji
     ];
-    terminal = "${pkgs.alacritty}/bin/alacritty";
+    terminal = "${pkgs.kitty}/bin/kitty";
     package = pkgs.rofi;
     extraConfig = {
       combi-modi = "window,drun";
@@ -188,7 +188,7 @@
     Type=Application
     Name=Wifi Configuration
     Comment=Manage network connections
-    Exec=${pkgs.alacritty}/bin/alacritty --class floating-tui -e ${pkgs.networkmanager}/bin/nmtui
+    Exec=${pkgs.kitty}/bin/kitty --class floating-tui -e ${pkgs.networkmanager}/bin/nmtui
     Terminal=false
     Categories=Network;Settings;
     Icon=network-wired
@@ -199,7 +199,7 @@
     Type=Application
     Name=Bluetooth Configuration
     Comment=Manage bluetooth connections
-    Exec=${pkgs.alacritty}/bin/alacritty --class floating-tui -e ${pkgs.bluetui}/bin/bluetui
+    Exec=${pkgs.kitty}/bin/kitty --class floating-tui -e ${pkgs.bluetui}/bin/bluetui
     Terminal=false
     Categories=Network;Settings;
     Icon=bluetooth
@@ -233,7 +233,7 @@
       Icon=battery
     '';
 
-  programs.alacritty = {
+  programs.kitty = {
     enable = true;
   };
 
@@ -459,7 +459,7 @@
 
       "$mod" = "Super";
       "$mod_alt" = "Shift";
-      "$terminal" = ''${pkgs.alacritty}/bin/alacritty'';
+      "$terminal" = ''${pkgs.kitty}/bin/kitty'';
       "$menu" = ''${config.programs.rofi.package}/bin/rofi -show combi -show-icons'';
       "$fileManager" = ''${pkgs.kdePackages.dolphin}/bin/dolphin'';
       "$locker" = ''${pkgs.hyprlock}/bin/hyprlock'';
