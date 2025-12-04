@@ -78,6 +78,11 @@
     };
   };
 
+  programs.yazi = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   stylix.targets.waybar.addCss = false;
   programs.waybar = {
     enable = true;
@@ -461,7 +466,7 @@
       "$mod_alt" = "Shift";
       "$terminal" = ''${pkgs.kitty}/bin/kitty'';
       "$menu" = ''${config.programs.rofi.package}/bin/rofi -show combi -show-icons'';
-      "$fileManager" = ''${pkgs.kdePackages.dolphin}/bin/dolphin'';
+      "$fileManager" = ''${pkgs.kitty}/bin/kitty -e ${pkgs.yazi}/bin/yazi'';
       "$locker" = ''${pkgs.hyprlock}/bin/hyprlock'';
 
       misc = {
