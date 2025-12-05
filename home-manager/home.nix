@@ -254,6 +254,15 @@ in
     Icon=network-wired
   '';
 
+  home.file.".local/share/applications/steam-gamescope.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Steam (gamescope)
+    Comment=Run steam through gamescope
+    Exec=${pkgs.gamescope}/bin/gamescope -e -w 1920 -h 1200 -- ${pkgs.steam}/bin/steam -gamepadui
+    Terminal=false
+  '';
+
   home.file.".local/share/applications/bluetui.desktop".text = ''
     [Desktop Entry]
     Type=Application
@@ -358,7 +367,7 @@ in
         Mod+E { spawn "${pkgs.kitty}/bin/kitty" "-e" "${pkgs.yazi}/bin/yazi"; }
         Mod+M { maximize-column; }
         Mod+Shift+M { toggle-window-floating; }
-        Mod+Shift+F { fullscreen-window; }
+        Mod+Shift+6 { fullscreen-window; }
         Mod+Space { spawn "${config.programs.rofi.package}/bin/rofi" "-show" "combi" "-show-icons"; }
         Mod+Slash { show-hotkey-overlay; }
         Mod+J { consume-or-expel-window-left; }
@@ -449,7 +458,6 @@ in
         Mod+BracketRight { consume-or-expel-window-right; }
         
         Mod+Backslash { switch-preset-column-width; }
-        Mod+F { fullscreen-window; }
         Mod+C { center-column; }
         
         Mod+Minus { set-column-width "-10%"; }
