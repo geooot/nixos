@@ -7,6 +7,37 @@
   pkgs,
   ...
 }:
+let
+  volumeUp = pkgs.writeShellScript "volume-up" ''
+    ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+    ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | ${pkgs.gawk}/bin/awk '{print int($2 * 100)}') -t 500 -r 66 "Volume"
+  '';
+
+  volumeDown = pkgs.writeShellScript "volume-down" ''
+    ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+    ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | ${pkgs.gawk}/bin/awk '{print int($2 * 100)}') -t 500 -r 66 "Volume"
+  '';
+
+  volumeMute = pkgs.writeShellScript "volume-mute" ''
+    ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+    ${pkgs.libnotify}/bin/notify-send -t 500 -r 66 "Volume Muted"
+  '';
+
+  micMute = pkgs.writeShellScript "mic-mute" ''
+    ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+    ${pkgs.libnotify}/bin/notify-send -t 500 -r 67 "Microphone Muted"
+  '';
+
+  brightnessUp = pkgs.writeShellScript "brightness-up" ''
+    ${pkgs.brightnessctl}/bin/brightnessctl s 10%+
+    ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.brightnessctl}/bin/brightnessctl g -P) -t 500 -r 68 "Brightness"
+  '';
+
+  brightnessDown = pkgs.writeShellScript "brightness-down" ''
+    ${pkgs.brightnessctl}/bin/brightnessctl s 10%-
+    ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.brightnessctl}/bin/brightnessctl g -P) -t 500 -r 68 "Brightness"
+  '';
+in
 {
   # You can import other home-manager modules here
   imports = [
@@ -234,6 +265,13 @@
     Icon=bluetooth
   '';
 
+  home.file.".local/bin/volume-up".source = volumeUp;
+  home.file.".local/bin/volume-down".source = volumeDown;
+  home.file.".local/bin/volume-mute".source = volumeMute;
+  home.file.".local/bin/mic-mute".source = micMute;
+  home.file.".local/bin/brightness-up".source = brightnessUp;
+  home.file.".local/bin/brightness-down".source = brightnessDown;
+
   xdg.configFile."niri/config.kdl".text = ''
     input {
         keyboard {
@@ -424,12 +462,12 @@
         Ctrl+Print { screenshot-screen; }
         Alt+Print { screenshot-window; }
         
-        XF86AudioRaiseVolume { spawn "${pkgs.wireplumber}/bin/wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
-        XF86AudioLowerVolume { spawn "${pkgs.wireplumber}/bin/wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
-        XF86AudioMute { spawn "${pkgs.wireplumber}/bin/wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-        XF86AudioMicMute { spawn "${pkgs.wireplumber}/bin/wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-        XF86MonBrightnessUp { spawn "${pkgs.brightnessctl}/bin/brightnessctl" "s" "10%+"; }
-        XF86MonBrightnessDown { spawn "${pkgs.brightnessctl}/bin/brightnessctl" "s" "10%-"; }
+        XF86AudioRaiseVolume { spawn "${volumeUp}"; }
+        XF86AudioLowerVolume { spawn "${volumeDown}"; }
+        XF86AudioMute { spawn "${volumeMute}"; }
+        XF86AudioMicMute { spawn "${micMute}"; }
+        XF86MonBrightnessUp { spawn "${brightnessUp}"; }
+        XF86MonBrightnessDown { spawn "${brightnessDown}"; }
         
         Mod+WheelScrollDown cooldown-ms=150 { focus-column-right; }
         Mod+WheelScrollUp cooldown-ms=150 { focus-column-left; }
@@ -670,10 +708,10 @@
         kb_layout = "us";
       };
       bindle = [
-        '', XF86AudioRaiseVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2 * 100)}') -t 500 -r 66 "Volume"''
-        '', XF86AudioLowerVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2 * 100)}') -t 500 -r 66 "Volume"''
-        '', XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%+''
-        '', XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl s 10%-''
+        ", XF86AudioRaiseVolume, exec, ${volumeUp}"
+        ", XF86AudioLowerVolume, exec, ${volumeDown}"
+        ", XF86MonBrightnessUp, exec, ${brightnessUp}"
+        ", XF86MonBrightnessDown, exec, ${brightnessDown}"
       ];
       env = [
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
@@ -772,6 +810,10 @@
         "$mod, space, exec, $menu"
         "$mod $mod_alt, P, pseudo" # dwindle
         "$mod, J, togglesplit"
+
+        # Media keys
+        ", XF86AudioMute, exec, ${volumeMute}"
+        ", XF86AudioMicMute, exec, ${micMute}"
 
         # Move focus with mod and arrows
         "$mod, left, movefocus, l"
