@@ -27,6 +27,16 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Increase network buffer sizes for better download performance
+  boot.kernel.sysctl = {
+    "net.core.rmem_max" = 134217728; # 128 MB max receive buffer
+    "net.core.wmem_max" = 134217728; # 128 MB max send buffer
+    "net.ipv4.tcp_rmem" = "4096 87380 67108864"; # TCP receive buffer: min 4KB, default 85KB, max 64MB
+    "net.ipv4.tcp_wmem" = "4096 65536 67108864"; # TCP send buffer: min 4KB, default 64KB, max 64MB
+    "net.core.netdev_max_backlog" = 5000; # Max packets in queue
+    "net.ipv4.tcp_congestion_control" = "bbr"; # Use BBR congestion control
+  };
+
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
 
