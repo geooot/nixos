@@ -86,28 +86,6 @@
   stylix.targets.waybar.addCss = false;
   programs.waybar = {
     enable = true;
-    settings.main = {
-      layer = "top";
-      position = "top";
-      clock.format = "{:%I:%M %p}";
-      tray.spacing = 8;
-      modules-left = [
-        "hyprland/workspaces"
-      ];
-      modules-center = [
-        "hyprland/window"
-      ];
-      modules-right = [
-        "tray"
-        "battery"
-        "clock"
-      ];
-      battery = {
-        format = "{icon} {capacity}%";
-        format-charging = "󱐋 {capacity}%";
-        format-icons = [ "󰁹" ];
-      };
-    };
     style = ''
       * {
           font-size: 14px;
@@ -148,6 +126,52 @@
           border: 1px solid @base0D;
       }
     '';
+  };
+
+  xdg.configFile."waybar/config-hyprland".text = builtins.toJSON {
+    layer = "top";
+    position = "top";
+    clock.format = "{:%I:%M %p}";
+    tray.spacing = 8;
+    modules-left = [
+      "hyprland/workspaces"
+    ];
+    modules-center = [
+      "hyprland/window"
+    ];
+    modules-right = [
+      "tray"
+      "battery"
+      "clock"
+    ];
+    battery = {
+      format = "{icon} {capacity}%";
+      format-charging = "󱐋 {capacity}%";
+      format-icons = [ "󰁹" ];
+    };
+  };
+
+  xdg.configFile."waybar/config-niri".text = builtins.toJSON {
+    layer = "top";
+    position = "top";
+    clock.format = "{:%I:%M %p}";
+    tray.spacing = 8;
+    modules-left = [
+      "niri/workspaces"
+    ];
+    modules-center = [
+      "niri/window"
+    ];
+    modules-right = [
+      "tray"
+      "battery"
+      "clock"
+    ];
+    battery = {
+      format = "{icon} {capacity}%";
+      format-charging = "󱐋 {capacity}%";
+      format-icons = [ "󰁹" ];
+    };
   };
 
   programs.zsh = {
@@ -210,6 +234,252 @@
     Icon=bluetooth
   '';
 
+  xdg.configFile."niri/config.kdl".text = ''
+    input {
+        keyboard {
+            xkb {
+                layout "us"
+            }
+        }
+        
+        touchpad {
+            tap
+            natural-scroll
+            click-method "clickfinger"
+            scroll-factor 0.3
+        }
+        
+        mouse {
+        }
+    }
+
+    output "eDP-1" {
+        scale 1.2
+    }
+
+    output "DP-3" {
+        mode "2560x1440@143.912"
+        position x=0 y=0
+        scale 1.0
+    }
+
+    output "DP-1" {
+        mode "2560x1440@143.912"
+        position x=2560 y=0
+        scale 1.0
+    }
+
+    layout {
+        gaps 4
+        
+        preset-column-widths {
+            proportion 0.33333
+            proportion 0.5
+            proportion 0.66667
+        }
+
+        default-column-width { proportion 0.5; }
+        
+        focus-ring {
+            width 2
+            active-color "#${config.lib.stylix.colors.base0D}"
+            inactive-color "#${config.lib.stylix.colors.base03}"
+        }
+        
+        border {
+            off
+        }
+    }
+
+    prefer-no-csd
+
+    screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+    spawn-at-startup "${pkgs.waybar}/bin/waybar" "-c" "/home/george/.config/waybar/config-niri"
+    spawn-at-startup "${pkgs.swww}/bin/swww-daemon"
+    spawn-at-startup "${pkgs.dunst}/bin/dunst"
+    spawn-at-startup "${pkgs.wayvnc}/bin/wayvnc" "-g"
+    spawn-at-startup "${pkgs.hypridle}/bin/hypridle"
+    spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
+
+    environment {
+        NIXOS_OZONE_WL "1"
+        ELECTRON_OZONE_PLATFORM_HINT "auto"
+    }
+
+    cursor {
+        xcursor-theme "Posy_Cursor_Black"
+        xcursor-size 24
+    }
+
+    binds {
+        Mod+Return { spawn "${pkgs.kitty}/bin/kitty"; }
+        Mod+Q { close-window; }
+        Mod+Shift+Q { spawn "${pkgs.hyprlock}/bin/hyprlock"; }
+        Mod+Escape { spawn "${pkgs.hyprlock}/bin/hyprlock"; }
+        Mod+E { spawn "${pkgs.kitty}/bin/kitty" "-e" "${pkgs.yazi}/bin/yazi"; }
+        Mod+M { maximize-column; }
+        Mod+Shift+M { toggle-window-floating; }
+        Mod+Shift+F { fullscreen-window; }
+        Mod+Space { spawn "${config.programs.rofi.package}/bin/rofi" "-show" "combi" "-show-icons"; }
+        Mod+Slash { show-hotkey-overlay; }
+        Mod+J { consume-or-expel-window-left; }
+        
+        Mod+Left { focus-column-left; }
+        Mod+Right { focus-column-right; }
+        Mod+Up { focus-window-up; }
+        Mod+Down { focus-window-down; }
+        Mod+H { focus-column-left; }
+        Mod+L { focus-column-right; }
+        Mod+K { focus-window-up; }
+        
+        Mod+Ctrl+Left { move-column-left; }
+        Mod+Ctrl+Right { move-column-right; }
+        Mod+Ctrl+Up { move-window-up; }
+        Mod+Ctrl+Down { move-window-down; }
+        Mod+Ctrl+H { move-column-left; }
+        Mod+Ctrl+L { move-column-right; }
+        Mod+Ctrl+K { move-window-up; }
+        Mod+Ctrl+J { move-window-down; }
+        
+        Mod+Shift+BracketLeft { move-column-left; }
+        Mod+Shift+BracketRight { move-column-right; }
+        
+        Mod+Home { focus-column-first; }
+        Mod+End { focus-column-last; }
+        Mod+Ctrl+Home { move-column-to-first; }
+        Mod+Ctrl+End { move-column-to-last; }
+        
+        Mod+Shift+Left { focus-monitor-left; }
+        Mod+Shift+Right { focus-monitor-right; }
+        Mod+Shift+Up { focus-monitor-up; }
+        Mod+Shift+Down { focus-monitor-down; }
+        Mod+Shift+H { focus-monitor-left; }
+        Mod+Shift+L { focus-monitor-right; }
+        Mod+Shift+K { focus-monitor-up; }
+        Mod+Shift+J { focus-monitor-down; }
+        
+        Mod+Shift+Ctrl+Left { move-column-to-monitor-left; }
+        Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
+        Mod+Shift+Ctrl+Up { move-column-to-monitor-up; }
+        Mod+Shift+Ctrl+Down { move-column-to-monitor-down; }
+        Mod+Shift+Ctrl+H { move-column-to-monitor-left; }
+        Mod+Shift+Ctrl+L { move-column-to-monitor-right; }
+        Mod+Shift+Ctrl+K { move-column-to-monitor-up; }
+        Mod+Shift+Ctrl+J { move-column-to-monitor-down; }
+        
+        Mod+Page_Down { focus-workspace-down; }
+        Mod+Page_Up { focus-workspace-up; }
+        Mod+U { focus-workspace-down; }
+        Mod+I { focus-workspace-up; }
+        Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+        Mod+Ctrl+Page_Up { move-column-to-workspace-up; }
+        Mod+Ctrl+U { move-column-to-workspace-down; }
+        Mod+Ctrl+I { move-column-to-workspace-up; }
+        
+        Mod+Shift+Page_Down { move-workspace-down; }
+        Mod+Shift+Page_Up { move-workspace-up; }
+        Mod+Shift+U { move-workspace-down; }
+        Mod+Shift+I { move-workspace-up; }
+        
+        Mod+1 { focus-workspace 1; }
+        Mod+2 { focus-workspace 2; }
+        Mod+3 { focus-workspace 3; }
+        Mod+4 { focus-workspace 4; }
+        Mod+5 { focus-workspace 5; }
+        Mod+6 { focus-workspace 6; }
+        Mod+7 { focus-workspace 7; }
+        Mod+8 { focus-workspace 8; }
+        Mod+9 { focus-workspace 9; }
+        Mod+0 { focus-workspace 10; }
+        
+        Mod+Alt+1 { move-column-to-workspace 1; }
+        Mod+Alt+2 { move-column-to-workspace 2; }
+        Mod+Alt+3 { move-column-to-workspace 3; }
+        Mod+Alt+4 { move-column-to-workspace 4; }
+        Mod+Alt+5 { move-column-to-workspace 5; }
+        Mod+Alt+6 { move-column-to-workspace 6; }
+        Mod+Alt+7 { move-column-to-workspace 7; }
+        Mod+Alt+8 { move-column-to-workspace 8; }
+        Mod+Alt+9 { move-column-to-workspace 9; }
+        Mod+Alt+0 { move-column-to-workspace 10; }
+        
+        Mod+Comma { consume-window-into-column; }
+        Mod+Period { expel-window-from-column; }
+        
+        Mod+BracketLeft { consume-or-expel-window-left; }
+        Mod+BracketRight { consume-or-expel-window-right; }
+        
+        Mod+Backslash { switch-preset-column-width; }
+        Mod+F { fullscreen-window; }
+        Mod+C { center-column; }
+        
+        Mod+Minus { set-column-width "-10%"; }
+        Mod+Equal { set-column-width "+10%"; }
+        
+        Mod+Shift+Minus { set-window-height "-10%"; }
+        Mod+Shift+Equal { set-window-height "+10%"; }
+        
+        Print { screenshot; }
+        Ctrl+Print { screenshot-screen; }
+        Alt+Print { screenshot-window; }
+        
+        XF86AudioRaiseVolume { spawn "${pkgs.wireplumber}/bin/wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+        XF86AudioLowerVolume { spawn "${pkgs.wireplumber}/bin/wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+        XF86AudioMute { spawn "${pkgs.wireplumber}/bin/wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+        XF86AudioMicMute { spawn "${pkgs.wireplumber}/bin/wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+        XF86MonBrightnessUp { spawn "${pkgs.brightnessctl}/bin/brightnessctl" "s" "10%+"; }
+        XF86MonBrightnessDown { spawn "${pkgs.brightnessctl}/bin/brightnessctl" "s" "10%-"; }
+        
+        Mod+WheelScrollDown cooldown-ms=150 { focus-column-right; }
+        Mod+WheelScrollUp cooldown-ms=150 { focus-column-left; }
+        Mod+Shift+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+        Mod+Shift+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+        
+        Mod+WheelScrollRight { focus-column-right; }
+        Mod+WheelScrollLeft { focus-column-left; }
+        Mod+Shift+WheelScrollRight { focus-workspace-down; }
+        Mod+Shift+WheelScrollLeft { focus-workspace-up; }
+    }
+
+    window-rule {
+        match app-id="floating-tui"
+        default-column-width { fixed 800; }
+    }
+
+    animations {
+        window-open {
+            duration-ms 150
+            curve "ease-out-quad"
+        }
+        
+        window-close {
+            duration-ms 150
+            curve "ease-out-quad"
+        }
+        
+        horizontal-view-movement {
+            duration-ms 200
+            curve "ease-out-cubic"
+        }
+        
+        window-movement {
+            duration-ms 200
+            curve "ease-out-cubic"
+        }
+        
+        workspace-switch {
+            duration-ms 200
+            curve "ease-out-cubic"
+        }
+        
+        window-resize {
+            duration-ms 150
+            curve "ease-out-quad"
+        }
+    }
+  '';
+
   home.file.".local/share/applications/powerprofile.desktop".text =
     let
       powerProfileScript = pkgs.writeShellScript "powerprofile-selector" ''
@@ -248,7 +518,7 @@
 
     settings = {
       general = {
-        after_sleep_cmd = "hyprctl dispatch dpms on";
+        after_sleep_cmd = "${pkgs.bash}/bin/bash -c 'if command -v hyprctl &> /dev/null; then hyprctl dispatch dpms on; elif command -v niri &> /dev/null; then niri msg action power-on-monitors; fi'";
         lock_cmd = "pidof hyprlock || hyprlock";
       };
       listener = [
@@ -258,8 +528,8 @@
         }
         {
           timeout = 630;
-          on-timeout = "hyprctl dispatch dpms off";
-          on-resume = "hyprctl dispatch dpms on";
+          on-timeout = "${pkgs.bash}/bin/bash -c 'if command -v hyprctl &> /dev/null; then hyprctl dispatch dpms off; elif command -v niri &> /dev/null; then niri msg action power-off-monitors; fi'";
+          on-resume = "${pkgs.bash}/bin/bash -c 'if command -v hyprctl &> /dev/null; then hyprctl dispatch dpms on; elif command -v niri &> /dev/null; then niri msg action power-on-monitors; fi'";
         }
       ];
     };
@@ -359,11 +629,10 @@
       ];
       exec-once = [
         ''${pkgs.wayvnc}/bin/wayvnc -g''
-        ''${pkgs.waybar}/bin/waybar''
+        ''${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-hyprland''
         ''${pkgs.swww}/bin/swww-daemon''
         ''${pkgs.dunst}/bin/dunst''
         ''${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300''
-        ''${pkgs.hypridle}/bin/hypridle''
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "hyprctl setcursor Posy_Cursor_Black 24"
       ];

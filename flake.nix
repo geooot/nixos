@@ -90,6 +90,7 @@
           ./hyprland/configuration.nix
           ./sunshine/configuration.nix
           ./obs/configuration.nix
+          ./niri/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
@@ -109,6 +110,7 @@
           ./systems/appam/hardware-configuration.nix
           ./systems/appam/configuration.nix
           ./hyprland/configuration.nix
+          ./niri/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
@@ -132,6 +134,7 @@
           ./systems/vada/hardware-configuration.nix
           ./systems/vada/configuration.nix
           ./obs/configuration.nix
+          ./niri/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
