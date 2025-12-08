@@ -9,23 +9,33 @@
 }:
 let
   volumeUp = pkgs.writeShellScript "volume-up" ''
-    ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+    ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+    ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ --limit 1.0
     ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | ${pkgs.gawk}/bin/awk '{print int($2 * 100)}') -t 500 -r 66 "Volume"
   '';
 
   volumeDown = pkgs.writeShellScript "volume-down" ''
-    ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+    ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+    ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- --limit 1.0
     ${pkgs.libnotify}/bin/notify-send -h int:value:$(${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | ${pkgs.gawk}/bin/awk '{print int($2 * 100)}') -t 500 -r 66 "Volume"
   '';
 
   volumeMute = pkgs.writeShellScript "volume-mute" ''
     ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-    ${pkgs.libnotify}/bin/notify-send -t 500 -r 66 "Volume Muted"
+    if ${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SINK@ | ${pkgs.gnugrep}/bin/grep -q MUTED; then
+      ${pkgs.libnotify}/bin/notify-send -t 500 -r 66 "Volume Muted"
+    else
+      ${pkgs.libnotify}/bin/notify-send -t 500 -r 66 "Volume Unmuted"
+    fi
   '';
 
   micMute = pkgs.writeShellScript "mic-mute" ''
     ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-    ${pkgs.libnotify}/bin/notify-send -t 500 -r 67 "Microphone Muted"
+    if ${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | ${pkgs.gnugrep}/bin/grep -q MUTED; then
+      ${pkgs.libnotify}/bin/notify-send -t 500 -r 67 "Microphone Muted"
+    else
+      ${pkgs.libnotify}/bin/notify-send -t 500 -r 67 "Microphone Unmuted"
+    fi
   '';
 
   brightnessUp = pkgs.writeShellScript "brightness-up" ''
