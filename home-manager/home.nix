@@ -269,7 +269,7 @@ in
     Type=Application
     Name=Steam (gamescope)
     Comment=Run steam through gamescope
-    Exec=${pkgs.gamescope}/bin/gamescope -e -w 1920 -h 1200 -- ${pkgs.steam}/bin/steam -gamepadui
+    Exec=${pkgs.gamescope}/bin/gamescope -e -w 1920 -h 1200 -- ${pkgs.steam}/bin/steam -gamepadui -720p -nointro
     Terminal=false
   '';
 
