@@ -168,6 +168,8 @@
     "flakes"
   ];
 
+  nix.settings.download-buffer-size = "500000000";
+
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
