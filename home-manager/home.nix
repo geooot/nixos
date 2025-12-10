@@ -284,6 +284,38 @@ in
     Icon=bluetooth
   '';
 
+  home.file.".local/share/applications/zsf-zulip.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=ZSF Zulip Chat
+    Exec=${pkgs.google-chrome}/bin/google-chrome-stable --app="https://zsf.zulipchat.com"
+    Terminal=false
+  '';
+
+  home.file.".local/share/applications/zig-zulip.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Zig Zulip Chat
+    Exec=${pkgs.google-chrome}/bin/google-chrome-stable --app="https://zig-lang.zulipchat.com"
+    Terminal=false
+  '';
+
+  home.file.".local/share/applications/t3-chat.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=T3 Chat
+    Exec=${pkgs.google-chrome}/bin/google-chrome-stable --app="https://t3.chat"
+    Terminal=false
+  '';
+
+  home.file.".local/share/applications/tldraw.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=tldraw
+    Exec=${pkgs.google-chrome}/bin/google-chrome-stable --app="https://tldraw.com"
+    Terminal=false
+  '';
+
   home.file.".local/bin/volume-up".source = volumeUp;
   home.file.".local/bin/volume-down".source = volumeDown;
   home.file.".local/bin/volume-mute".source = volumeMute;

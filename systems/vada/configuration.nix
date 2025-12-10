@@ -126,6 +126,7 @@
     packages = with pkgs; [
       kdePackages.kate
       obsidian
+      google-chrome
       opencode
       spotify
       mpv
@@ -144,6 +145,8 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  programs.chromium.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
