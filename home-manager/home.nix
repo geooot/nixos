@@ -630,6 +630,10 @@ in
 
   programs.kitty = {
     enable = true;
+    keybindings = {
+      "ctrl+insert" = "copy_to_clipboard";
+      "shift+insert" = "paste_from_clipboard";
+    };
   };
 
   services.hypridle = {
