@@ -131,6 +131,7 @@ in
     settings = {
       manager = {
         show_size = true;
+        linemode = "size";
       };
       preview = {
         tab_size = 2;
