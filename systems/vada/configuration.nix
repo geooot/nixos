@@ -133,6 +133,7 @@
       vesktop
       blender
       clonehero
+      mediainfo
       #  thunderbird
     ];
   };

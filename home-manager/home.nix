@@ -122,6 +122,38 @@ in
   programs.yazi = {
     enable = true;
     enableZshIntegration = true;
+    plugins = {
+      inherit (pkgs.yaziPlugins) rich-preview;
+      inherit (pkgs.yaziPlugins) yatline;
+      inherit (pkgs.yaziPlugins) vcs-files;
+      inherit (pkgs.yaziPlugins) mediainfo;
+    };
+    settings = {
+      manager = {
+        show_size = true;
+      };
+      preview = {
+        tab_size = 2;
+        max_width = 1000;
+        max_height = 1000;
+      };
+      plugin = {
+        prepend_previewers = [
+          {
+            mime = "image/*";
+            run = "mediainfo";
+          }
+          {
+            mime = "audio/*";
+            run = "mediainfo";
+          }
+          {
+            mime = "video/*";
+            run = "mediainfo";
+          }
+        ];
+      };
+    };
   };
 
   stylix.targets.waybar.addCss = false;
