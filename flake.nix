@@ -94,6 +94,7 @@
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
+          ./mdns/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
@@ -114,6 +115,7 @@
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
+          ./mdns/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
@@ -138,6 +140,7 @@
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
+          ./mdns/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
@@ -155,6 +158,7 @@
           ./systems/idli/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
+          ./mdns/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
