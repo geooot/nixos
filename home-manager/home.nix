@@ -453,7 +453,7 @@ in
             tap
             natural-scroll
             click-method "clickfinger"
-            scroll-factor 0.3
+            scroll-factor 1
         }
         
         mouse {
@@ -861,7 +861,7 @@ in
         touchpad = {
           disable_while_typing = false;
           natural_scroll = true;
-          scroll_factor = 0.3;
+          scroll_factor = 1;
           clickfinger_behavior = 1;
         };
       };
