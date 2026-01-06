@@ -97,6 +97,8 @@
     #media-session.enable = true;
   };
 
+  powerManagement.powertop.enable = true;
+
   # services.auto-cpufreq = {
   #   enable = true;
   #   settings = {
