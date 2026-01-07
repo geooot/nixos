@@ -391,6 +391,19 @@ in
     Terminal=false
   '';
 
+  # Override default Steam desktop entry to add -system-composer flag
+  home.file.".local/share/applications/steam.desktop" =
+    let
+      steamDesktop = "${pkgs.steam}/share/applications/steam.desktop";
+      modifiedDesktop = pkgs.runCommand "steam-desktop-modified" { } ''
+        cp ${steamDesktop} $out
+        sed -i 's|^Exec=steam|Exec=steam -system-composer|g' $out
+      '';
+    in
+    {
+      text = builtins.readFile modifiedDesktop;
+    };
+
   home.file.".local/share/applications/bluetui.desktop".text = ''
     [Desktop Entry]
     Type=Application
