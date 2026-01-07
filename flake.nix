@@ -141,6 +141,7 @@
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
+          ./hibernation/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
