@@ -48,7 +48,7 @@
     };
 
     gt-nvim = {
-      url = "github:geooot/gt-nix-cats-nvim-config";
+      url = "github:geooot/gt-nix-cats-nvim-config/last-working-highlighting";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

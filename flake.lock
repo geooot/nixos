@@ -337,15 +337,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1765315291,
-        "narHash": "sha256-Qd/NEP2Zy2MxRIJJ6xvtA4GawW0ySR2ZiCdVYIJuTfY=",
+        "lastModified": 1768027415,
+        "narHash": "sha256-V/9blxiW3TAiAjs28PGwmxINa9VLlOsHybBxJSsHkZw=",
         "owner": "geooot",
         "repo": "gt-nix-cats-nvim-config",
-        "rev": "175c5a6ff6d27e12c538681b35f62b8c167436eb",
+        "rev": "13d29c703282d5e9aa913b2a481ea51564249928",
         "type": "github"
       },
       "original": {
         "owner": "geooot",
+        "ref": "last-working-highlighting",
         "repo": "gt-nix-cats-nvim-config",
         "type": "github"
       }
