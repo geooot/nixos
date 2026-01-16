@@ -344,7 +344,7 @@ in
       enable = true;
       theme = "avit";
     };
-    initExtra = ''
+    initContent = ''
       # Function to display background jobs with gear icon
       jobs_indicator() {
         local jobs_count=$(jobs | wc -l)
