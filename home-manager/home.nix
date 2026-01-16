@@ -335,7 +335,6 @@ in
 
   programs.zsh = {
     enable = true;
-    autosuggestion.enable = true;
     enableCompletion = true;
     shellAliases = {
       vim = "nvim";
@@ -345,6 +344,40 @@ in
       enable = true;
       theme = "avit";
     };
+    initExtra = ''
+      # Function to display background jobs with gear icon
+      jobs_indicator() {
+        local jobs_count=$(jobs | wc -l)
+        if [ $jobs_count -gt 0 ]; then
+          if [ $jobs_count -eq 1 ]; then
+            echo "%{$fg[yellow]%}⚙️ %{$reset_color%}"
+          else
+            echo "%{$fg[yellow]%}⚙️$jobs_count %{$reset_color%}"
+          fi
+        fi
+      }
+
+      # Function to display nix shell indicator
+      nix_shell_indicator() {
+        if [ -n "$IN_NIX_SHELL" ]; then
+          echo "%{$fg[blue]%}❄️ %{$reset_color%}"
+        fi
+      }
+
+      # Function to display nested shell indicator
+      nested_shell_indicator() {
+        if [ "$SHLVL" -gt 2 ]; then
+          echo "%{$fg[magenta]%}↓$SHLVL %{$reset_color%}"
+        fi
+      }
+
+      # Enable prompt substitution and prepend jobs indicator to left prompt
+      setopt PROMPT_SUBST
+      PROMPT='$(jobs_indicator)'$PROMPT
+
+      # Prepend nix shell and nested shell indicators to right prompt
+      RPROMPT='$(nix_shell_indicator)$(nested_shell_indicator)'$RPROMPT
+    '';
   };
 
   programs.rofi = {
