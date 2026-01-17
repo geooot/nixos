@@ -141,6 +141,7 @@
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
           ./hibernation/configuration.nix
+          ./sprite/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
