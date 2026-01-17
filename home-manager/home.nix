@@ -531,7 +531,7 @@ in
             proportion 0.66667
         }
 
-        default-column-width { proportion 0.5; }
+        default-column-width { proportion 0.66667; }
         
         focus-ring {
             width 2
