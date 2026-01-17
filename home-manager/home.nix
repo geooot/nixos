@@ -56,6 +56,7 @@ in
 
     # You can also split up your configuration and import pieces of it here:
     # ./nvim.nix
+    ../email/configuration.nix
   ];
 
   nixpkgs = {
@@ -338,7 +339,7 @@ in
     enableCompletion = true;
     shellAliases = {
       vim = "nvim";
-      wifi = ''${pkgs.networkmanager}/bin/nmtui'';
+      wifi = "${pkgs.networkmanager}/bin/nmtui";
     };
     oh-my-zsh = {
       enable = true;
@@ -884,11 +885,11 @@ in
         ",preferred,auto,1.2"
       ];
       exec-once = [
-        ''${pkgs.wayvnc}/bin/wayvnc -g''
-        ''${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-hyprland''
-        ''${pkgs.swww}/bin/swww-daemon''
-        ''${pkgs.dunst}/bin/dunst''
-        ''${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300''
+        "${pkgs.wayvnc}/bin/wayvnc -g"
+        "${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-hyprland"
+        "${pkgs.swww}/bin/swww-daemon"
+        "${pkgs.dunst}/bin/dunst"
+        "${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "hyprctl setcursor Posy_Cursor_Black 24"
       ];
@@ -989,10 +990,10 @@ in
 
       "$mod" = "Super";
       "$mod_alt" = "Shift";
-      "$terminal" = ''${pkgs.kitty}/bin/kitty'';
-      "$menu" = ''${config.programs.rofi.package}/bin/rofi -show combi -show-icons'';
-      "$fileManager" = ''${pkgs.kitty}/bin/kitty -e ${pkgs.yazi}/bin/yazi'';
-      "$locker" = ''${pkgs.hyprlock}/bin/hyprlock'';
+      "$terminal" = "${pkgs.kitty}/bin/kitty";
+      "$menu" = "${config.programs.rofi.package}/bin/rofi -show combi -show-icons";
+      "$fileManager" = "${pkgs.kitty}/bin/kitty -e ${pkgs.yazi}/bin/yazi";
+      "$locker" = "${pkgs.hyprlock}/bin/hyprlock";
 
       misc = {
         disable_hyprland_logo = true;
