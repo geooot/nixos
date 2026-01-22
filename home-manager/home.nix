@@ -364,6 +364,17 @@ in
     Icon=bluetooth
   '';
 
+  home.file.".local/share/applications/aerc.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Email
+    Comment=Read and send email
+    Exec=${pkgs.kitty}/bin/kitty -e ${pkgs.aerc}/bin/aerc
+    Terminal=false
+    Categories=Network;Email;
+    Icon=mail-client
+  '';
+
   home.file.".local/share/applications/zsf-zulip.desktop".text = ''
     [Desktop Entry]
     Type=Application
