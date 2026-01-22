@@ -57,6 +57,7 @@
         "[Gmail]/Sent Mail"
         "[Gmail]/Drafts"
         "[Gmail]/Trash"
+        "Newsletters"
       ];
 
       # Subfolders configuration
@@ -76,8 +77,10 @@
         "INBOX"
         "[Gmail]/Sent Mail"
         "[Gmail]/Drafts"
+        "Newsletters"
       ];
-      onNotify = "${pkgs.isync}/bin/mbsync gmail:INBOX";
+      # Sync all folders bidirectionally when new mail arrives
+      onNotify = "${pkgs.isync}/bin/mbsync -a";
       onNotifyPost = "${pkgs.libnotify}/bin/notify-send 'New mail arrived'";
     };
   };
@@ -92,5 +95,32 @@
   # Since we're typically always online, skip the ping test
   home.sessionVariables = {
     EMAIL_CONN_NOTEST = "true";
+  };
+
+  # Periodic mbsync timer to sync local changes back to Gmail
+  # goimapnotify only handles Gmail -> Local, this handles Local -> Gmail
+  systemd.user.services.mbsync = {
+    Unit = {
+      Description = "Sync local maildir changes to Gmail";
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.isync}/bin/mbsync -a";
+      # If password is locked, fail quickly and try again on next run
+      TimeoutStartSec = "60s";
+    };
+  };
+
+  systemd.user.timers.mbsync = {
+    Unit = {
+      Description = "Periodic mbsync timer";
+    };
+    Timer = {
+      OnBootSec = "2m";
+      OnUnitActiveSec = "5m";
+    };
+    Install = {
+      WantedBy = [ "timers.target" ];
+    };
   };
 }
