@@ -20,8 +20,8 @@
     enable = true;
     enableSshSupport = false;
     # Cache passphrase for 8 hours
-    defaultCacheTtl = 28800;
-    maxCacheTtl = 28800;
+    defaultCacheTtl = 31560000;
+    maxCacheTtl = 31560000;
     pinentry.package = pkgs.pinentry-curses;
   };
 
