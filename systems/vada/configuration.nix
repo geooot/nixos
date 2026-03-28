@@ -144,6 +144,19 @@
 
   hardware.bluetooth.enable = true;
 
+  # DisplayLink support for USB docking stations/monitors (Wayland)
+  boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
+  boot.kernelModules = [ "evdi" ];
+  systemd.services.displaylink = {
+    description = "DisplayLink Manager";
+    after = [ "display-manager.service" ];
+    wantedBy = [ "graphical.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.displaylink}/bin/DisplayLinkManager";
+      Restart = "on-failure";
+    };
+  };
+
   virtualisation.waydroid.enable = true;
 
   # Install firefox.
@@ -212,7 +225,9 @@
   # services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPortRanges = [
+    { from = 3000; to = 5000; }
+  ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;

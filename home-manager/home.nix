@@ -433,20 +433,17 @@ in
         }
     }
 
+    output "DP-3" {
+        position x=0 y=0
+    }
+
+    output "DVI-I-1" {
+        position x=2560 y=0
+    }
+
     output "eDP-1" {
         scale 1.2
-    }
-
-    output "DP-3" {
-        mode "2560x1440@143.912"
-        position x=0 y=0
-        scale 1.0
-    }
-
-    output "DP-1" {
-        mode "2560x1440@143.912"
-        position x=2560 y=0
-        scale 1.0
+        position x=1760 y=1440
     }
 
     layout {
