@@ -23,35 +23,35 @@
   boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
 
   # Persistent mounts for 12TB LVM volumes
-  fileSystems."/mnt/downloads" = {
+  fileSystems."/dosa/media" = {
     device = "/dev/disk/by-uuid/ec6eb804-b021-402d-9a09-5934ec66fbea";
     fsType = "ext4";
   };
 
-  fileSystems."/mnt/backups" = {
-    device = "/dev/disk/by-uuid/c96682d8-ff4e-4283-944e-7c156ba6ba3d";
-    fsType = "ext4";
-  };
+  # fileSystems."/mnt/backups" = {
+  #   device = "/dev/disk/by-uuid/c96682d8-ff4e-4283-944e-7c156ba6ba3d";
+  #   fsType = "ext4";
+  # };
 
   fileSystems."/mnt/personal" = {
     device = "/dev/disk/by-uuid/a49327d1-1ed6-4a54-b0bb-d4ffe6071e8c";
     fsType = "ext4";
   };
 
-  fileSystems."/mnt/misc" = {
-    device = "/dev/disk/by-uuid/e74bb537-dcb9-4346-84e2-aa7c2a5c36a6";
-    fsType = "ext4";
-  };
-
-  fileSystems."/mnt/spices" = {
-    device = "/dev/disk/by-uuid/dae8b17f-0f9a-4d1c-a2f6-b4cd48ea84b2";
-    fsType = "ext4";
-  };
-
-  fileSystems."/mnt/repos" = {
-    device = "/dev/disk/by-uuid/c64c50ac-dd10-4610-82a0-b022537e0e0c";
-    fsType = "ext4";
-  };
+  # fileSystems."/mnt/misc" = {
+  #   device = "/dev/disk/by-uuid/e74bb537-dcb9-4346-84e2-aa7c2a5c36a6";
+  #   fsType = "ext4";
+  # };
+  #
+  # fileSystems."/mnt/spices" = {
+  #   device = "/dev/disk/by-uuid/dae8b17f-0f9a-4d1c-a2f6-b4cd48ea84b2";
+  #   fsType = "ext4";
+  # };
+  #
+  # fileSystems."/mnt/repos" = {
+  #   device = "/dev/disk/by-uuid/c64c50ac-dd10-4610-82a0-b022537e0e0c";
+  #   fsType = "ext4";
+  # };
 
   nixpkgs.config.allowUnfree = true;
 
