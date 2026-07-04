@@ -80,7 +80,6 @@
       nodejs
       clonehero
       zoxide
-      neovim
       waybar
       alacritty
       firefox
@@ -90,7 +89,6 @@
       libnotify
       spotify
       cargo
-      neofetch
       vesktop
       blender
       btop
@@ -118,12 +116,9 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    inputs.gt-nvim.packages.${pkgs.system}.default
     wget
-    libgcc
     nodejs_22
-    libgcc
-    gccgo
     kdePackages.dolphin
     qt6.qtwayland
     qt6Packages.qtstyleplugin-kvantum
@@ -179,10 +174,27 @@
   #   };
   # };
 
-  # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm = {
+  # Enable the X11 windowing system.
+  # You can disable this if you're only using the Wayland session.
+  services.xserver.enable = false;
+
+  # Enable the ly window manager.
+  services.displayManager.ly = {
     enable = true;
-    wayland.enable = true;
+    settings = {
+      animate = true;
+      animation = "colormix";
+      hide_borders = true;
+      clock = "%c";
+      bigclock = true;
+      bigclock_12hr = true;
+    };
+  };
+
+  # Configure keymap in X11
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
   };
 
   # # Load nvidia driver for Xorg and Wayland

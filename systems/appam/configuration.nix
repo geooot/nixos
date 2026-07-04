@@ -135,8 +135,6 @@
     wayvnc
     pavucontrol
     inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
-    libgcc
-    gccgo
   ];
 
   programs.zsh.enable = true;

@@ -134,10 +134,7 @@
   environment.systemPackages = with pkgs; [
     neovim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    libgcc
     nodejs_22
-    libgcc
-    gccgo
     kdePackages.dolphin
     qt6.qtwayland
     qt6Packages.qtstyleplugin-kvantum

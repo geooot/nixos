@@ -81,9 +81,10 @@
 
           ./systems/dosa/hardware-configuration.nix
           ./systems/dosa/configuration.nix
+          # xremap-flake.nixosModules.default
+          # ./xremap/configuration.nix
           ./hyprland/configuration.nix
           ./sunshine/configuration.nix
-          ./obs/configuration.nix
           ./niri/configuration.nix
           ./plasma6/configuration.nix
           ./stylix/configuration.nix
