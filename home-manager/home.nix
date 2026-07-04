@@ -448,6 +448,8 @@ in
 
     layout {
         gaps 4
+        center-focused-column "always"
+        always-center-single-column
         
         preset-column-widths {
             proportion 0.33333
@@ -795,12 +797,6 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.system}.default;
-    plugins = [
-      inputs.hyprgrass.packages.${pkgs.system}.default
-
-      # optional integration with pulse-audio, see examples/hyprgrass-pulse/README.md
-      inputs.hyprgrass.packages.${pkgs.system}.hyprgrass-pulse
-    ];
     settings = {
       monitor = [
         "DP-3,2560x1440,0x0,1"
@@ -898,10 +894,6 @@ in
           #
           # might be removed in the future in favor of event hooks
           emulate_touchpad_swipe = false;
-
-          hyprgrass-bind = [
-            ",edge:d:u,exec,kill -34 $(ps -C wvkbd-mobintl -o pid | grep -v PID)"
-          ];
 
           experimental = {
             # send proper cancel events to windows instead of hacky touch_up events,

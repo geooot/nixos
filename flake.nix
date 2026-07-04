@@ -38,13 +38,8 @@
     };
 
     hyprland = {
-      url = "github:hyprwm/Hyprland/v0.52.1-b";
+      url = "github:hyprwm/Hyprland/v0.54.3";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    hyprgrass = {
-      url = "github:horriblename/hyprgrass/64d5f5051e7686c02d367bd761774ade701e304a";
-      inputs.hyprland.follows = "hyprland";
     };
 
     gt-nvim = {
