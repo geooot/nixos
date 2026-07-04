@@ -83,6 +83,7 @@
           ./systems/dosa/configuration.nix
           # xremap-flake.nixosModules.default
           # ./xremap/configuration.nix
+          ./tailscale/configuration.nix
           ./hyprland/configuration.nix
           ./sunshine/configuration.nix
           ./niri/configuration.nix
