@@ -448,7 +448,6 @@ in
 
     layout {
         gaps 4
-        center-focused-column "always"
         always-center-single-column
         
         preset-column-widths {
