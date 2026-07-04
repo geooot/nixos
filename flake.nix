@@ -43,7 +43,7 @@
     };
 
     gt-nvim = {
-      url = "github:geooot/gt-nix-cats-nvim-config/last-working-highlighting";
+      url = "github:geooot/gt-nix-cats-nvim-config";
     };
 
     # Private flakes
