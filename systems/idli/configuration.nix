@@ -145,6 +145,7 @@
     wget
     git
     inputs.gt-nvim.packages.${pkgs.stdenv.hostPlatform.system}.default
+    mosh
     fzf
     ripgrep
     btop

@@ -160,6 +160,7 @@
           ./plasma6/configuration.nix
           ./opengamepadui/configuration.nix
           ./systems/idli/configuration.nix
+          ./tailscale/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
