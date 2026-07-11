@@ -433,7 +433,7 @@ in
         }
     }
 
-    output "DP-3" {
+    output "DP-1" {
         position x=0 y=0
     }
 
@@ -626,32 +626,32 @@ in
 
     animations {
         window-open {
-            duration-ms 150
+            duration-ms 64
             curve "ease-out-quad"
         }
         
         window-close {
-            duration-ms 150
+            duration-ms 64
             curve "ease-out-quad"
         }
         
         horizontal-view-movement {
-            duration-ms 200
+            duration-ms 128
             curve "ease-out-cubic"
         }
         
         window-movement {
-            duration-ms 200
+            duration-ms 128
             curve "ease-out-cubic"
         }
         
         workspace-switch {
-            duration-ms 200
+            duration-ms 64
             curve "ease-out-cubic"
         }
         
         window-resize {
-            duration-ms 150
+            duration-ms 64
             curve "ease-out-quad"
         }
     }
