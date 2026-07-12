@@ -22,7 +22,10 @@
     ];
     config = {
       niri = {
-        default = [ "gnome" "gtk" ];
+        default = [
+          "gnome"
+          "gtk"
+        ];
         "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
       };
     };

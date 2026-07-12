@@ -10,7 +10,11 @@ let
   clientPkg = pkgs.attic-client;
   serverPkg = pkgs.attic-server;
   serverPort = lib.toInt (lib.last (lib.splitString ":" cfg.server.listen));
-  pushEndpoint = if cfg.serverEndpoint != null then cfg.serverEndpoint else "http://localhost:${toString serverPort}";
+  pushEndpoint =
+    if cfg.serverEndpoint != null then
+      cfg.serverEndpoint
+    else
+      "http://localhost:${toString serverPort}";
   # Generate the same TOML config that services.atticd uses, so we can call
   # atticadm directly with a store path instead of relying on the module's
   # atticd-atticadm wrapper at runtime.

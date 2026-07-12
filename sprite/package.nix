@@ -21,7 +21,9 @@ let
   };
 
   # Get the architecture-specific data for the current system
-  archData = archMap.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  archData =
+    archMap.${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
   arch = archData.arch;
 in
 stdenv.mkDerivation rec {
