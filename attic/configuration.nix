@@ -30,13 +30,15 @@ in
     };
 
     serverEndpoint = lib.mkOption {
-      type = lib.types.str;
-      default = "http://localhost:8080";
+      type = lib.types.nullOr lib.types.str;
+      default = null;
       description = ''
-        URL of the Attic server to push to and pull from. Defaults to
-        localhost, which only works on the machine running the server. On
-        client machines, set this to the server's address (e.g.
-        `http://dosa:8080` over Tailscale).
+        URL of the Attic server to push to and pull from. When null, the
+        Attic client substituter and automatic push service are disabled
+        (useful for a machine that only runs the server). On client
+        machines, set this to the server's address (e.g.
+        `http://dosa:8080` over Tailscale), or to `http://localhost:8080`
+        on the server itself if it should also push to its own cache.
       '';
     };
 
@@ -111,7 +113,9 @@ in
     lib.mkMerge [
       {
         environment.systemPackages = [ clientPkg ];
+      }
 
+      (lib.mkIf (cfg.serverEndpoint != null) {
         nix.settings = {
           substituters = [ cfg.serverEndpoint ];
         }
@@ -156,7 +160,7 @@ in
           wantedBy = [ "multi-user.target" ];
           pathConfig.PathChanged = "/run/current-system";
         };
-      }
+      })
 
       (lib.mkIf cfg.server.enable {
         services.atticd = {
@@ -240,8 +244,9 @@ in
               echo "attic-bootstrap: token written to $TOKEN_FILE"
             fi
 
-            # Login with the token (as root, for cache creation)
-            ${lib.getExe clientPkg} login --set-default local "${cfg.serverEndpoint}" "$TOKEN"
+            # Login with the token (as root, for cache creation). Always
+            # connect to the local server, regardless of serverEndpoint.
+            ${lib.getExe clientPkg} login --set-default local "http://localhost:${toString serverPort}" "$TOKEN"
 
             # Create the cache if it doesn't exist
             if ${lib.getExe clientPkg} cache info "${cfg.cacheName}" 2>/dev/null; then
