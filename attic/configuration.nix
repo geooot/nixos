@@ -10,6 +10,7 @@ let
   clientPkg = pkgs.attic-client;
   serverPkg = pkgs.attic-server;
   serverPort = lib.toInt (lib.last (lib.splitString ":" cfg.server.listen));
+  pushEndpoint = if cfg.serverEndpoint != null then cfg.serverEndpoint else "http://localhost:${toString serverPort}";
   # Generate the same TOML config that services.atticd uses, so we can call
   # atticadm directly with a store path instead of relying on the module's
   # atticd-atticadm wrapper at runtime.
@@ -22,9 +23,10 @@ in
       type = lib.types.bool;
       default = true;
       description = ''
-        Enable the Attic binary cache client: adds the server as a Nix
-        substituter (once `cachePublicKey` is set) and automatically pushes the
-        current system's closure to the cache on every rebuild. Set to false to
+        Enable the Attic binary cache client. When enabled, the machine
+        automatically pushes newly-built store paths to the Attic cache
+        via `attic watch-store`. If `serverEndpoint` is set, the cache is
+        also configured as a Nix substituter for pulling. Set to false to
         opt out on a particular machine.
       '';
     };
@@ -33,12 +35,13 @@ in
       type = lib.types.nullOr lib.types.str;
       default = null;
       description = ''
-        URL of the Attic server to push to and pull from. When null, the
-        Attic client substituter and automatic push service are disabled
-        (useful for a machine that only runs the server). On client
-        machines, set this to the server's address (e.g.
-        `http://dosa:8080` over Tailscale), or to `http://localhost:8080`
-        on the server itself if it should also push to its own cache.
+        URL of the Attic server to pull from as a Nix substituter. When
+        null, the cache is not added as a substituter — useful on the
+        server machine itself, where paths are already local. Pushing
+        still works regardless: the watch-store daemon connects to the
+        local server when `server.enable` is true, or to this endpoint
+        when set. On client machines, set this to the server's address
+        (e.g. `http://dosa:8080` over Tailscale).
       '';
     };
 
@@ -122,43 +125,34 @@ in
         // (lib.optionalAttrs (cfg.cachePublicKey != null) {
           trusted-public-keys = [ cfg.cachePublicKey ];
         });
+      })
 
-        systemd.services.attic-push-system = {
-          description = "Push the current NixOS system closure to the Attic cache";
+      (lib.mkIf (cfg.serverEndpoint != null || cfg.server.enable) {
+        systemd.services.attic-watch-store = {
+          description = "Watch the Nix store for new paths and push to the Attic cache";
           after = [ "network-online.target" ];
           wants = [ "network-online.target" ];
           wantedBy = [ "multi-user.target" ];
           serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
             Environment = [ "HOME=/root" ];
+            Restart = "on-failure";
+            RestartSec = "30";
           };
           script = ''
             if [ ! -f "${cfg.tokenFile}" ]; then
-              echo "attic-push-system: token file ${cfg.tokenFile} not found; skipping push." >&2
-              exit 0
+              echo "attic-watch-store: token file ${cfg.tokenFile} not found; will retry." >&2
+              exit 1
             fi
 
             TOKEN="$(cat "${cfg.tokenFile}")"
             if [ -z "$TOKEN" ]; then
-              echo "attic-push-system: token file is empty; skipping push." >&2
-              exit 0
+              echo "attic-watch-store: token file is empty; will retry." >&2
+              exit 1
             fi
 
-            ${lib.getExe clientPkg} login --set-default local "${cfg.serverEndpoint}" "$TOKEN"
-            echo "attic-push-system: pushing system closure to cache '${cfg.cacheName}'..."
-            ${lib.getExe clientPkg} push "${cfg.cacheName}" /run/current-system
+            ${lib.getExe clientPkg} login --set-default local "${pushEndpoint}" "$TOKEN"
+            exec ${lib.getExe clientPkg} watch-store "${cfg.cacheName}"
           '';
-        };
-
-        # Watch /run/current-system (updated by nixos-rebuild switch) and
-        # trigger a push whenever a new generation is activated. This avoids
-        # referencing config.system.build.toplevel at eval time, which would
-        # cause an infinite recursion (toplevel depends on this unit's script).
-        systemd.paths.attic-push-system = {
-          description = "Watch for NixOS generation changes to trigger Attic push";
-          wantedBy = [ "multi-user.target" ];
-          pathConfig.PathChanged = "/run/current-system";
         };
       })
 
@@ -271,6 +265,9 @@ in
             # Print the token for distribution to client machines
             echo "attic-bootstrap: >>> To set up client machines, copy this token to ${cfg.tokenFile} on each client: <<<"
             echo "attic-bootstrap: $TOKEN"
+
+            # Start the watch-store daemon now that a token exists
+            systemctl restart attic-watch-store
           '')
         ];
 
