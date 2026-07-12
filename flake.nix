@@ -92,6 +92,7 @@
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
           ./attic/configuration.nix
+          ./auto-upgrade/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
