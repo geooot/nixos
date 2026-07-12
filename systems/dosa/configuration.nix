@@ -16,6 +16,9 @@
   imports = [
   ];
 
+  # Host the Attic binary cache server for all machines.
+  attic.server.enable = true;
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

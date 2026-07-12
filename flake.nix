@@ -91,6 +91,7 @@
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
+          ./attic/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
@@ -140,6 +141,7 @@
           ./mdns/configuration.nix
           ./hibernation/configuration.nix
           ./sprite/configuration.nix
+          ./attic/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
@@ -158,6 +160,7 @@
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
+          ./attic/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];

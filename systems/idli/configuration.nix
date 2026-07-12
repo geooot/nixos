@@ -13,6 +13,9 @@
   imports = [
   ];
 
+  # Pull from / push to the Attic cache hosted on dosa.
+  attic.serverEndpoint = "http://dosa:8080";
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
