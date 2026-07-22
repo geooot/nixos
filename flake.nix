@@ -79,8 +79,6 @@
           disko.nixosModules.default
           (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
 
-          ./systems/dosa/hardware-configuration.nix
-          ./systems/dosa/configuration.nix
           # xremap-flake.nixosModules.default
           # ./xremap/configuration.nix
           ./tailscale/configuration.nix
@@ -94,6 +92,8 @@
           ./attic/configuration.nix
           ./auto-upgrade/configuration.nix
           ./homelab/configuration.nix
+          ./systems/dosa/hardware-configuration.nix
+          ./systems/dosa/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];

@@ -101,7 +101,7 @@ in
 
       endpoint = lib.mkOption {
         type = lib.types.str;
-        default = "houston.prod.surfshark.com:51820";
+        default = "";
         description = "Surfshark WireGuard endpoint (host:port).";
       };
 
@@ -113,13 +113,13 @@ in
 
       address = lib.mkOption {
         type = lib.types.str;
-        default = "10.14.0.2/32";
+        default = "";
         description = "WireGuard interface address assigned by Surfshark.";
       };
 
       dns = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [ "1.1.1.1" ];
+        default = [ ];
         description = "DNS servers used inside the surfshark namespace.";
       };
     };
@@ -171,8 +171,9 @@ in
   config = {
     assertions = [
       {
-        assertion = cfg.vpn.enable -> cfg.vpn.publicKey != "";
-        message = "homelab.vpn.publicKey must be set when homelab.vpn.enable is true.";
+        assertion =
+          cfg.vpn.enable -> cfg.vpn.publicKey != "" && cfg.vpn.endpoint != "" && cfg.vpn.address != "";
+        message = "homelab.vpn.{publicKey,endpoint,address} must be set when homelab.vpn.enable is true.";
       }
       {
         assertion = cfg.vpn.bindDeluge -> cfg.vpn.enable;

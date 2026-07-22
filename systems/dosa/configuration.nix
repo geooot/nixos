@@ -56,6 +56,18 @@
   #   fsType = "ext4";
   # };
 
+  homelab.vpn = {
+    enable = true;
+    bindDeluge = true;
+    publicKey = "SpMH/p90bg9ZAG6V2DWJQ9csWPVnKcDVppIp9Xul5G8=";
+    endpoint = "us-sea.prod.surfshark.com:51820";
+    address = "10.14.0.2/16";
+    dns = [
+      "162.252.172.57"
+      "149.154.159.92"
+    ];
+  };
+
   nixpkgs.config.allowUnfree = true;
 
   fonts.packages = [
