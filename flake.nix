@@ -93,6 +93,7 @@
           ./mdns/configuration.nix
           ./attic/configuration.nix
           ./auto-upgrade/configuration.nix
+          ./homelab/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];
