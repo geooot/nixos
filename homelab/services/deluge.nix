@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -9,7 +8,6 @@ let
   cfg = config.homelab;
   delugeCfg = config.services.deluge;
   configDir = "${delugeCfg.dataDir}/.config/deluge";
-  netnsExec = "${pkgs.iproute2}/bin/ip netns exec surfshark";
 in
 {
   config = lib.mkIf cfg.services.deluge.enable {
@@ -20,6 +18,9 @@ in
       web.port = 8112;
     };
 
+    # When VPN binding is enabled, use systemd's NetworkNamespacePath to
+    # place deluge in the surfshark namespace. This is the systemd-native
+    # approach — no `ip netns exec` wrapper, no CAP_SYS_ADMIN needed.
     systemd.services = lib.mkIf cfg.vpn.bindDeluge {
       deluged = {
         after = [
@@ -27,9 +28,7 @@ in
           "network.target"
         ];
         requires = [ "surfshark-netns.service" ];
-        serviceConfig.ExecStart = lib.mkForce (
-          "${netnsExec} ${delugeCfg.package}/bin/deluged --do-not-daemonize --config ${configDir}"
-        );
+        serviceConfig.NetworkNamespacePath = "/var/run/netns/surfshark";
       };
       delugeweb = {
         after = [
@@ -37,9 +36,7 @@ in
           "deluged.service"
         ];
         requires = [ "surfshark-netns.service" ];
-        serviceConfig.ExecStart = lib.mkForce (
-          "${netnsExec} ${delugeCfg.package}/bin/deluge-web --do-not-daemonize --config ${configDir} --port ${toString config.services.deluge.web.port}"
-        );
+        serviceConfig.NetworkNamespacePath = "/var/run/netns/surfshark";
       };
     };
   };
