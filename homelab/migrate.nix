@@ -136,6 +136,15 @@ let
               /var/lib/jellyfin/config/network.xml
           fi
         fi
+        # Rewrite stale docker paths in the library database. Jellyfin 10.9+
+        # consolidated library.db into jellyfin.db; check both for safety.
+        for db in /var/lib/jellyfin/data/jellyfin.db /var/lib/jellyfin/data/library.db; do
+          if [ -f "$db" ]; then
+            sqlite3 "$db" \
+              "UPDATE BaseItems SET Path = REPLACE(Path, '/media/', '$media/') WHERE Path LIKE '/media/%';" \
+              2>/dev/null || true
+          fi
+        done
         chown -R jellyfin:"$group" /var/lib/jellyfin
         chmod -R g+w /var/lib/jellyfin
       fi
