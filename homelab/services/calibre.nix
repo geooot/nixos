@@ -27,6 +27,10 @@ in
       options = {
         calibreLibrary = "${cfg.mediaDir}/books";
         enableBookConversion = true;
+        reverseProxyAuth = {
+          enable = true;
+          header = "X-Forwarded-For";
+        };
       };
       package = pkgs.calibre-web.overridePythonAttrs (old: rec {
         dependencies = old.dependencies ++ old.optional-dependencies.kobo;

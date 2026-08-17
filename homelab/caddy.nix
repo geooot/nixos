@@ -13,7 +13,9 @@ let
       tls {
         dns cloudflare {$CLOUDFLARE_API_TOKEN}
       }
-      reverse_proxy ${target}
+      reverse_proxy ${target} {
+        trusted_proxies cloudflare
+      }
     '';
   };
 in
@@ -65,6 +67,7 @@ in
             '';
           };
           "calibre.${cfg.domain}" = mkVhost "127.0.0.1:8083";
+          "calibre.${cfg.publicDomain}" = mkVhost "127.0.0.1:8083";
         })
       ];
     };

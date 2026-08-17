@@ -31,6 +31,12 @@ in
       description = "Base domain for homelab virtual hosts.";
     };
 
+    publicDomain = lib.mkOption {
+      type = lib.types.str;
+      default = "geooot.com";
+      description = "Base domain for publicly exposed homelab virtual hosts.";
+    };
+
     mediaDir = lib.mkOption {
       type = lib.types.str;
       default = "/dosa/media";
