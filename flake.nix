@@ -85,7 +85,7 @@
           ./hyprland/configuration.nix
           ./sunshine/configuration.nix
           ./niri/configuration.nix
-          ./plasma6/configuration.nix
+          # ./plasma6/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
           ./mdns/configuration.nix
