@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 
@@ -27,6 +28,9 @@ in
         calibreLibrary = "${cfg.mediaDir}/books";
         enableBookConversion = true;
       };
+      package = pkgs.calibre-web.overridePythonAttrs (old: rec {
+        dependencies = old.dependencies ++ old.optional-dependencies.kobo;
+      });
     };
   };
 }
