@@ -794,7 +794,7 @@ in
   };
 
   wayland.windowManager.hyprland = {
-    enable = true;
+    enable = false;
     package = inputs.hyprland.packages.${pkgs.system}.default;
     settings = {
       monitor = [

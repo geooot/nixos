@@ -30,18 +30,18 @@
 
     xremap-flake = {
       url = "github:xremap/nix-flake";
-      inputs.hyprland.follows = "hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     rose-pine-hyprcursor = {
       url = "github:ndom91/rose-pine-hyprcursor";
     };
 
-    hyprland = {
-      url = "github:hyprwm/Hyprland/v0.54.3";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
+    # hyprland = {
+    #   url = "github:hyprwm/Hyprland/v0.54.3";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+    #
     gt-nvim = {
       url = "github:geooot/gt-nix-cats-nvim-config";
     };
@@ -82,7 +82,7 @@
           # xremap-flake.nixosModules.default
           # ./xremap/configuration.nix
           ./tailscale/configuration.nix
-          ./hyprland/configuration.nix
+          # ./hyprland/configuration.nix
           ./sunshine/configuration.nix
           ./niri/configuration.nix
           # ./plasma6/configuration.nix
@@ -128,7 +128,7 @@
           stylix.nixosModules.stylix
           # disko.nixosModules.default
           # (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
-          ./hyprland/configuration.nix
+          # ./hyprland/configuration.nix
           ./sunshine/configuration.nix
           xremap-flake.nixosModules.default
           ./xremap/configuration.nix
