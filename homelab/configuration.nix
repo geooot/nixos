@@ -74,8 +74,8 @@ in
 
     caddyPluginHash = lib.mkOption {
       type = lib.types.str;
-      default = "sha256-hEHgAG0F0ozHRAPuxEqLyTATBrE+pajeXDiSNwniorg=";
-      description = "Vendor hash for caddy built with the cloudflare DNS plugin.";
+      default = "sha256-WWMdpXe+uCE1Lh7Q+jDvCUi++B+Gimy3YR5x+aRG+Yc=";
+      description = "Vendor hash for caddy built with the cloudflare DNS + IP source plugins.";
     };
 
     calibreAdminHash = lib.mkOption {

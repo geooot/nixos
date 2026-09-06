@@ -13,9 +13,7 @@ let
       tls {
         dns cloudflare {$CLOUDFLARE_API_TOKEN}
       }
-      reverse_proxy ${target} {
-        trusted_proxies cloudflare
-      }
+      reverse_proxy ${target}
     '';
   };
 in
@@ -24,11 +22,22 @@ in
     services.caddy = {
       enable = true;
       package = pkgs.caddy.withPlugins {
-        plugins = [ "github.com/caddy-dns/cloudflare@v0.2.4" ];
+        plugins = [
+          "github.com/caddy-dns/cloudflare@v0.2.4"
+          "github.com/WeidiDeng/caddy-cloudflare-ip@v0.0.0-20231130002422-f53b62aa13cb"
+        ];
         hash = cfg.caddyPluginHash;
       };
       email = cfg.acmeEmail;
       environmentFile = cfg.cloudflareTokenFile;
+
+      globalConfig = ''
+        servers {
+          trusted_proxies cloudflare
+          trusted_proxies_strict
+          client_ip_headers CF-Connecting-IP CF-Connecting-IPv6 X-Forwarded-For
+        }
+      '';
 
       virtualHosts = lib.mkMerge [
         (lib.mkIf cfg.services.jellyfin.enable {
