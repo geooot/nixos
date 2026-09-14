@@ -12,6 +12,7 @@ in
   imports = [
     ./media-group.nix
     ./caddy.nix
+    ./ddns.nix
     ./vpn.nix
     ./migrate.nix
     ./services/jellyfin.nix
