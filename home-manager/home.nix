@@ -420,6 +420,7 @@ in
             xkb {
                 layout "us"
             }
+            repeat-delay 200
         }
         
         touchpad {
@@ -928,8 +929,8 @@ in
 
       bindm = [
         "$mod, mouse:272, movewindow"
-        "$mod, mouse:273, resizewindow"
         "$mod $mod_alt, mouse:272, resizewindow"
+        "$mod, mouse:273, resizewindow"
       ];
 
       bind = [
