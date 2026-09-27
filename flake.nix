@@ -79,8 +79,8 @@
           disko.nixosModules.default
           (import ./disko/disko.nix { device = "/dev/nvme0n1"; })
 
-          # xremap-flake.nixosModules.default
-          # ./xremap/configuration.nix
+          xremap-flake.nixosModules.default
+          ./xremap/configuration.nix
           ./tailscale/configuration.nix
           # ./hyprland/configuration.nix
           ./sunshine/configuration.nix
