@@ -124,7 +124,7 @@
     firefox
     rofi
     dunst
-    swww
+    awww
     libnotify
     cargo
     neofetch
@@ -134,7 +134,7 @@
     htop
     wayvnc
     pavucontrol
-    inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
+    inputs.rose-pine-hyprcursor.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   programs.zsh.enable = true;

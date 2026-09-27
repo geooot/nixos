@@ -98,7 +98,7 @@
       firefox
       rofi
       dunst
-      swww
+      awww
       libnotify
       spotify
       cargo
@@ -144,7 +144,7 @@
     htop
     wayvnc
     pavucontrol
-    inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
+    inputs.rose-pine-hyprcursor.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   stylix.image = ../background.png;

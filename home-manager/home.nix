@@ -123,6 +123,7 @@ in
   programs.yazi = {
     enable = true;
     enableZshIntegration = true;
+    shellWrapperName = "y";
     plugins = {
       inherit (pkgs.yaziPlugins) rich-preview;
       inherit (pkgs.yaziPlugins) yatline;
@@ -301,9 +302,9 @@ in
     plugins = with pkgs; [
       rofimoji
     ];
-    terminal = "${pkgs.kitty}/bin/kitty";
     package = pkgs.rofi;
-    extraConfig = {
+    settings = {
+      terminal = "${pkgs.kitty}/bin/kitty";
       combi-modi = "window,drun";
       cycle = true;
       display-window = "Window";
@@ -480,7 +481,7 @@ in
     screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
     spawn-at-startup "${pkgs.waybar}/bin/waybar" "-c" "/home/george/.config/waybar/config-niri"
-    spawn-at-startup "${pkgs.swww}/bin/swww-daemon"
+    spawn-at-startup "${pkgs.awww}/bin/awww-daemon"
     spawn-at-startup "${pkgs.dunst}/bin/dunst"
     spawn-at-startup "${pkgs.wayvnc}/bin/wayvnc" "-g"
     spawn-at-startup "${pkgs.hypridle}/bin/hypridle"
@@ -792,6 +793,7 @@ in
   };
 
   home.pointerCursor = {
+    enable = true;
     package = pkgs.posy-cursors;
     name = "Posy_Cursor_Black";
     size = 24;
@@ -801,7 +803,7 @@ in
 
   wayland.windowManager.hyprland = {
     enable = false;
-    package = inputs.hyprland.packages.${pkgs.system}.default;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.default;
     settings = {
       monitor = [
         "DP-3,2560x1440,0x0,1"
@@ -811,7 +813,7 @@ in
       exec-once = [
         "${pkgs.wayvnc}/bin/wayvnc -g"
         "${pkgs.waybar}/bin/waybar -c ~/.config/waybar/config-hyprland"
-        "${pkgs.swww}/bin/swww-daemon"
+        "${pkgs.awww}/bin/awww-daemon"
         "${pkgs.dunst}/bin/dunst"
         "${pkgs.wvkbd}/bin/wvkbd-mobintl --hidden -L 300"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"

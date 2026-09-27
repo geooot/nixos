@@ -176,7 +176,7 @@
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
-    inputs.gt-nvim.packages.${pkgs.system}.default
+    inputs.gt-nvim.packages.${pkgs.stdenv.hostPlatform.system}.default
     fzf
     ripgrep
     btop

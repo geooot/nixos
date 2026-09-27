@@ -129,7 +129,7 @@
       firefox
       rofi
       dunst
-      swww
+      awww
       libnotify
       spotify
       cargo
@@ -162,7 +162,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    inputs.gt-nvim.packages.${pkgs.system}.default
+    inputs.gt-nvim.packages.${pkgs.stdenv.hostPlatform.system}.default
     wget
     nodejs_22
     kdePackages.dolphin
@@ -174,7 +174,7 @@
     htop
     wayvnc
     pavucontrol
-    inputs.rose-pine-hyprcursor.packages.${pkgs.system}.default
+    inputs.rose-pine-hyprcursor.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.linuxKernel.packages.linux_zen.xone
   ];
 
