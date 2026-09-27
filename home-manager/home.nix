@@ -447,6 +447,11 @@ in
         position x=1760 y=1440
     }
 
+    output "Smithay Winit Unknown" {
+        scale 2
+        position x=1760 y=1440
+    }
+
     layout {
         gaps 4
         always-center-single-column

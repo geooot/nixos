@@ -149,6 +149,7 @@
       kdePackages.kdenlive
       zed-editor
       opencode
+      waypipe
     ];
   };
 
