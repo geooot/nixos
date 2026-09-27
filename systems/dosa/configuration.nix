@@ -150,6 +150,9 @@
       zed-editor
       opencode
       waypipe
+      duckdb
+      lazygit
+      prismlauncher
     ];
   };
 

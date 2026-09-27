@@ -139,6 +139,8 @@
       blender
       clonehero
       mediainfo
+      duckdb
+      lazygit
       #  thunderbird
     ];
   };
