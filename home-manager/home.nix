@@ -503,20 +503,21 @@ in
         Mod+Shift+Q { spawn "${pkgs.hyprlock}/bin/hyprlock"; }
         Mod+Escape { spawn "${pkgs.hyprlock}/bin/hyprlock"; }
         Mod+E { spawn "${pkgs.kitty}/bin/kitty" "-e" "${pkgs.yazi}/bin/yazi"; }
+        Mod+B { spawn "${pkgs.firefox}/bin/firefox"; }
         Mod+M { maximize-column; }
         Mod+Shift+M { toggle-window-floating; }
         Mod+Shift+6 { fullscreen-window; }
         Mod+Space { spawn "${config.programs.rofi.package}/bin/rofi" "-show" "combi" "-show-icons"; }
         Mod+Slash { show-hotkey-overlay; }
-        Mod+J { consume-or-expel-window-left; }
-        
+
         Mod+Left { focus-column-left; }
         Mod+Right { focus-column-right; }
         Mod+Up { focus-window-up; }
         Mod+Down { focus-window-down; }
-        Mod+H { focus-column-left; }
+        Mod+J { focus-column-left; }
         Mod+L { focus-column-right; }
-        Mod+K { focus-window-up; }
+        Mod+I { focus-window-up; }
+        Mod+K { focus-window-down; }
         
         Mod+Ctrl+Left { move-column-left; }
         Mod+Ctrl+Right { move-column-right; }
@@ -913,6 +914,7 @@ in
       "$mod" = "Super";
       "$mod_alt" = "Shift";
       "$terminal" = "${pkgs.kitty}/bin/kitty";
+      "$browser" = "${pkgs.firefox}/bin/firefox";
       "$menu" = "${config.programs.rofi.package}/bin/rofi -show combi -show-icons";
       "$fileManager" = "${pkgs.kitty}/bin/kitty -e ${pkgs.yazi}/bin/yazi";
       "$locker" = "${pkgs.hyprlock}/bin/hyprlock";
@@ -942,6 +944,7 @@ in
 
       bind = [
         "$mod, Return, exec, $terminal"
+        "$mod, B, exec, $terminal"
         "$mod, Q, killactive"
         "$mod $mod_alt, Q, exec, $locker"
         "$mod, escape, exec, $locker"
