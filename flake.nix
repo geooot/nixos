@@ -92,6 +92,7 @@
           ./attic/configuration.nix
           ./auto-upgrade/configuration.nix
           ./homelab/configuration.nix
+          ./obs-flatpak/configuration.nix
           ./systems/dosa/hardware-configuration.nix
           ./systems/dosa/configuration.nix
 
