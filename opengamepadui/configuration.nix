@@ -22,15 +22,21 @@
     gamescopeSession = {
       enable = true;
       args = [
+        "--prefer-output"
+        "*,eDP-1"
+        "--xwayland-count"
+        "2"
+        "--default-touch-mode"
+        "4"
+        "--hide-cursor-delay"
+        "3000"
+        "--fade-out-duration"
+        "200"
+        "--steam"
         "-w"
         "1920"
         "-h"
         "1080"
-        "-W"
-        "1920"
-        "-H"
-        "1080"
-        "-f"
       ];
     };
   };
