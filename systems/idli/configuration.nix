@@ -65,25 +65,6 @@
     user = "george";
   };
 
-  services.displayManager.defaultSession = "steam";
-
-  # Enable steam with its own session
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    gamescopeSession = {
-      enable = true;
-      args = [
-        "-w 1920"
-        "-h 1080"
-        "-W 1920"
-        "-H 1080"
-        "-f"
-      ];
-    };
-    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-  };
-
   hardware.xone.enable = true;
   hardware.xpadneo.enable = true;
 

@@ -158,6 +158,7 @@
           disko.nixosModules.default
           (import ./disko/disko.nix { device = "/dev/sda"; })
           ./plasma6/configuration.nix
+          ./opengamepadui/configuration.nix
           ./systems/idli/configuration.nix
           ./stylix/configuration.nix
           ./home-manager/configuration.nix
