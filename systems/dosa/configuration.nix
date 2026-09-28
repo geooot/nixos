@@ -156,6 +156,11 @@
     ];
   };
 
+  # Wierd crap needed to allow writing to keychron keyboard
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3434", ATTRS{idProduct}=="0a13", MODE="0660", GROUP="input", TAG+="uaccess", TAG+="udev-acl"
+  '';
+
   # Enable flakes
   nix.settings.experimental-features = [
     "nix-command"
