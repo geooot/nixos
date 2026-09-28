@@ -1,9 +1,18 @@
 { config, pkgs, ... }:
 
 {
+  # Upstream unit has no Restart=; don't leave remaps dead if xremap crashes
+  systemd.user.services.xremap.serviceConfig = {
+    Restart = "on-failure";
+    RestartSec = 3;
+  };
+
   services.xremap = {
     enable = true;
     withWlroots = true;
+    # Re-grab devices as they (dis)appear; wireless keyboards like the
+    # Keychron re-enumerate on sleep/wake and xremap exits without this.
+    watch = true;
     serviceMode = "user";
     userName = "george"; # TODO: fix, seems bad
     config.modmap = [
