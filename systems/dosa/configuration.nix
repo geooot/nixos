@@ -19,6 +19,13 @@
   # Host the Attic binary cache server for all machines.
   attic.server.enable = true;
 
+  # Run the T3 Code headless server (t3 serve) behind a Caddy vhost.
+  t3code.serve = {
+    enable = true;
+    host = "127.0.0.1";
+    caddyVhost = "t3code.${config.homelab.domain}";
+  };
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
