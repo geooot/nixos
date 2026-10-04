@@ -26,6 +26,16 @@
     caddyVhost = "t3code.${config.homelab.domain}";
   };
 
+  # Sync ~/github.com/geooot, ~/Photos and ~/Documents with other machines.
+  syncthing = {
+    enable = true;
+    devices = {
+      # Find the device ID in vada's Syncthing GUI (http://localhost:8384,
+      # Actions -> Show ID), then uncomment:
+      # vada = "XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX-XXXXXXX";
+    };
+  };
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

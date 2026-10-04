@@ -94,6 +94,7 @@
           ./homelab/configuration.nix
           ./obs-flatpak/configuration.nix
           ./t3code/configuration.nix
+          ./syncthing/configuration.nix
           ./systems/dosa/hardware-configuration.nix
           ./systems/dosa/configuration.nix
 
@@ -146,6 +147,7 @@
           ./hibernation/configuration.nix
           ./sprite/configuration.nix
           ./attic/configuration.nix
+          ./syncthing/configuration.nix
 
           # inputs.impermanence.nixosModules.impermanence
         ];

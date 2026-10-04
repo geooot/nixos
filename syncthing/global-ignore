@@ -1,0 +1,25 @@
+// Global Syncthing ignore patterns, applied to every synced folder.
+// Written in native stignore syntax (first match wins), see
+// https://docs.syncthing.net/users/ignoring.html
+// Patterns from a folder's .gitignore files take precedence over this list.
+// Edit this file and rebuild (or wait up to 15 minutes) for changes to apply.
+
+// Syncthing's own per-machine metadata
+.stfolder
+.stversions
+.sttrash
+
+// OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+// Nix build outputs and direnv caches
+result
+result-*
+.direnv
+
+// Common dependency/build caches
+node_modules
+__pycache__
+*.pyc

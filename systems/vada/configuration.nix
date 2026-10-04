@@ -16,6 +16,16 @@
   # Pull from / push to the Attic cache hosted on dosa.
   attic.serverEndpoint = "http://dosa:8080";
 
+  # Sync ~/github.com/geooot, ~/Photos and ~/Documents with other machines.
+  syncthing = {
+    enable = true;
+    devices = {
+      # Find the device ID in dosa's Syncthing GUI (http://localhost:8384,
+      # Actions -> Show ID), then uncomment:
+      dosa = "HPQVJYB-4NWHEBC-6LWZC6X-VLPYLEH-7XKXPQK-BA3RVDH-BAERG4F-6KMVUQH";
+    };
+  };
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
