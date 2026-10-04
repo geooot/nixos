@@ -36,5 +36,18 @@ in
         dependencies = old.dependencies ++ old.optional-dependencies.kobo;
       });
     };
+
+    # The stock SystemCallFilter hardening denies @resources syscalls
+    # (setrlimit/prlimit64/nice), which kills calibre's page-render worker
+    # during book conversion and hangs "Convert book" jobs at 1%.
+    # Re-allow @resources; keep the rest of the filter list.
+    systemd.services.calibre-web.serviceConfig.SystemCallFilter = lib.mkForce [
+      "~@obsolete"
+      "~@privileged"
+      "~@raw-io"
+      "~@mount"
+      "~@debug"
+      "~@cpu-emulation"
+    ];
   };
 }

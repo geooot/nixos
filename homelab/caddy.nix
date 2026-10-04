@@ -16,6 +16,20 @@ let
       reverse_proxy ${target}
     '';
   };
+
+  # calibre-web reads the request scheme from X-Scheme (not X-Forwarded-Proto).
+  # Without it, Kobo download URLs are generated as http:// and the ereader
+  # fails the download silently on the http->https redirect.
+  mkCalibreWebVhost = target: {
+    extraConfig = ''
+      tls {
+        dns cloudflare {$CLOUDFLARE_API_TOKEN}
+      }
+      reverse_proxy ${target} {
+        header_up X-Scheme {scheme}
+      }
+    '';
+  };
 in
 {
   config = {
@@ -75,8 +89,8 @@ in
               reverse_proxy 127.0.0.1:8090
             '';
           };
-          "calibre.${cfg.domain}" = mkVhost "127.0.0.1:8083";
-          "calibre.${cfg.publicDomain}" = mkVhost "127.0.0.1:8083";
+          "calibre.${cfg.domain}" = mkCalibreWebVhost "127.0.0.1:8083";
+          "calibre.${cfg.publicDomain}" = mkCalibreWebVhost "127.0.0.1:8083";
         })
       ];
     };
