@@ -29,10 +29,21 @@ let
     # Resolve the endpoint in the root namespace BEFORE creating the
     # namespace. Inside the namespace there's no route to any DNS server
     # until the WireGuard tunnel is up, so wg set cannot resolve there.
+    # At boot this races DHCP/Tailscale DNS readiness, so retry for up to
+    # ~60s: getent exits 2 until DNS works, which under `set -euo pipefail`
+    # would otherwise abort the script on the first attempt.
     endpoint="${cfg.vpn.endpoint}"
     host="''${endpoint%%:*}"
     port="''${endpoint##*:}"
-    addr="$(${pkgs.glibc.getent}/bin/getent ahostsv4 "$host" | head -1 | awk '{print $1}')"
+    addr=""
+    for attempt in $(seq 1 30); do
+      addr="$(${pkgs.glibc.getent}/bin/getent ahostsv4 "$host" | head -1 | awk '{print $1}')" || addr=""
+      if [ -n "$addr" ]; then
+        break
+      fi
+      echo "surfshark-netns: DNS not ready for $host, retry $attempt/30"
+      sleep 2
+    done
     if [ -z "$addr" ]; then
       echo "surfshark-netns: failed to resolve $host" >&2
       exit 1
@@ -93,6 +104,11 @@ let
 in
 {
   config = lib.mkIf cfg.vpn.enable {
+    # network-online.target defaults to waiting for any (IPv4 or IPv6)
+    # dhcpcd lease. Require the IPv4 lease so it is only reached once
+    # there is an IPv4 default route for the WireGuard endpoint.
+    networking.dhcpcd.wait = "ipv4";
+
     # Enable IP forwarding so the root namespace can route packets from
     # the surfshark namespace (veth) out to the internet (eno1/etc).
     boot.kernel.sysctl = {
@@ -107,8 +123,18 @@ in
 
     systemd.services.surfshark-netns = {
       description = "Surfshark WireGuard network namespace";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
+      # /etc/resolv.conf points at Tailscale MagicDNS (100.100.100.100), so
+      # DNS additionally depends on tailscaled, not just network-online.
+      after = [
+        "network-online.target"
+        "nss-lookup.target"
+        "tailscaled.service"
+      ];
+      wants = [
+        "network-online.target"
+        "nss-lookup.target"
+        "tailscaled.service"
+      ];
       wantedBy = [ "multi-user.target" ];
       path = [
         pkgs.iproute2
@@ -121,6 +147,11 @@ in
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
+        # Belt-and-braces alongside the in-script DNS retry loop: if the
+        # tunnel still cannot come up, retry instead of leaving
+        # deluge (which Requires this unit) down for the whole boot.
+        Restart = "on-failure";
+        RestartSec = "5s";
         ExecStart = "${upScript}/bin/surfshark-netns-up";
         ExecStop = "${downScript}/bin/surfshark-netns-down";
       };
