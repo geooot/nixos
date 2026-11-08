@@ -557,16 +557,16 @@ in
         Mod+Page_Down { focus-workspace-down; }
         Mod+Page_Up { focus-workspace-up; }
         Mod+U { focus-workspace-down; }
-        Mod+I { focus-workspace-up; }
+        Mod+O { focus-workspace-up; }
         Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
         Mod+Ctrl+Page_Up { move-column-to-workspace-up; }
         Mod+Ctrl+U { move-column-to-workspace-down; }
-        Mod+Ctrl+I { move-column-to-workspace-up; }
-        
+        Mod+Ctrl+O { move-column-to-workspace-up; }
+
         Mod+Shift+Page_Down { move-workspace-down; }
         Mod+Shift+Page_Up { move-workspace-up; }
         Mod+Shift+U { move-workspace-down; }
-        Mod+Shift+I { move-workspace-up; }
+        Mod+Shift+O { move-workspace-up; }
         
         Mod+1 { focus-workspace 1; }
         Mod+2 { focus-workspace 2; }
