@@ -10,6 +10,10 @@ state_file="${XDG_STATE_HOME:-$HOME/.local/state}/hypr/layouts.json"
 clients=$(hyprctl clients -j 2>/dev/null) || exit 1
 
 addr="${1:-last}"
+if [ "$addr" != "last" ]; then
+  # Quickshell reports addresses without the 0x prefix; hyprctl needs it.
+  addr="0x${addr#0x}"
+fi
 if [ "$addr" = "last" ]; then
   addr=$(printf '%s' "$clients" | jq -r '[.[] | select(.workspace.name == "special:minimized")] | sort_by(.focusHistoryID) | last | .address // empty')
   [ -n "$addr" ] || exit 0

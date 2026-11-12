@@ -6,7 +6,7 @@
 #   - Quickshell provides the bar and the menu (./quickshell/*.qml)
 #   - Keybinds are ported from the niri config in home.nix, adjusted:
 #       Super+H/J/K/L focus, Super+Y cycles workspace layout
-#       (dwindle -> scrolling -> floating, Omarchy-style), Super+M minimizes
+#       (dwindle -> scrolling -> floating, Omarchy-style), Super+Shift+H minimizes
 #       a window on a floating workspace to special:minimized (Omarchy-style)
 {
   config,
@@ -69,6 +69,7 @@ in
   xdg.configFile."quickshell/shell.qml".source = ./quickshell/shell.qml;
   xdg.configFile."quickshell/Bar.qml".source = ./quickshell/Bar.qml;
   xdg.configFile."quickshell/Menu.qml".source = ./quickshell/Menu.qml;
+  xdg.configFile."quickshell/ControlCenter.qml".source = ./quickshell/ControlCenter.qml;
   xdg.configFile."quickshell/WifiPanel.qml".source = ./quickshell/WifiPanel.qml;
   xdg.configFile."quickshell/SoundPanel.qml".source = ./quickshell/SoundPanel.qml;
   xdg.configFile."quickshell/PowerPanel.qml".source = ./quickshell/PowerPanel.qml;

@@ -6,4 +6,7 @@ ShellRoot {
 
     Menu {
     }
+
+    ControlCenter {
+    }
 }

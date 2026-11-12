@@ -4,13 +4,14 @@ import Quickshell.Networking
 Item {
     id: root
 
-    property bool shown: false
+    property bool active: false
+    property int sel: 0
+
+    signal wantFocus
 
     Theme {
         id: theme
     }
-
-    implicitHeight: content.implicitHeight
 
     property var wifiDev: {
         for (const dev of Networking.devices.values) {
@@ -20,14 +21,43 @@ Item {
         return null;
     }
     property var pending: null
+    readonly property int rowCount: 1 + (wifiDev ? wifiDev.networks.values.length : 0)
 
-    function updateScanner() {
-        if (root.wifiDev)
-            root.wifiDev.scannerEnabled = root.shown;
+    function clampSel() {
+        sel = Math.max(0, Math.min(sel, rowCount - 1));
     }
 
-    onShownChanged: updateScanner()
-    onWifiDevChanged: updateScanner()
+    function ensureVisible() {
+        const y = sel * 30;
+        if (y < flick.contentY)
+            flick.contentY = y;
+        else if (y + 30 > flick.contentY + flick.height)
+            flick.contentY = y + 30 - flick.height;
+    }
+
+    function navMove(d) {
+        sel += d;
+        clampSel();
+        ensureVisible();
+    }
+
+    function navActivate() {
+        activateRow(sel);
+    }
+
+    function navAdjust(d) {
+        activateRow(sel);
+    }
+
+    function activateRow(i) {
+        if (i === 0) {
+            Networking.wifiEnabled = !Networking.wifiEnabled;
+            return;
+        }
+        const network = wifiDev.networks.values[i - 1];
+        if (network)
+            activateNetwork(network);
+    }
 
     function isSecured(network) {
         return network.security !== WifiSecurityType.Open;
@@ -42,8 +72,8 @@ Item {
             network.connect();
             return;
         }
-        if (root.isSecured(network)) {
-            root.pending = network;
+        if (isSecured(network)) {
+            pending = network;
             password.text = "";
             password.forceActiveFocus();
         } else {
@@ -51,63 +81,89 @@ Item {
         }
     }
 
-    Column {
-        id: content
+    onActiveChanged: {
+        if (wifiDev)
+            wifiDev.scannerEnabled = active;
+        clampSel();
+    }
+    onWifiDevChanged: {
+        if (wifiDev)
+            wifiDev.scannerEnabled = active;
+    }
 
-        width: parent.width
-        spacing: 6
+    Flickable {
+        id: flick
 
-        Row {
+        anchors.fill: parent
+        clip: true
+        contentHeight: col.implicitHeight
+
+        Column {
+            id: col
+
             width: parent.width
-            spacing: 8
+            spacing: 2
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Wi-Fi"
-                color: theme.fg
-                font.family: theme.fontFamily
-                font.pixelSize: theme.fontSize
-                font.bold: true
-            }
-
-            Item {
-                width: parent.width - 120
-                height: 1
-            }
-
+            // Row 0: Wi-Fi toggle
             Rectangle {
-                width: 36
-                height: 18
-                color: Networking.wifiEnabled ? theme.accent : theme.border
+                width: parent.width
+                height: 28
+                color: root.sel === 0 ? theme.hoverBg : "transparent"
+                border.width: root.sel === 0 ? 1 : 0
+                border.color: theme.accent
 
-                Rectangle {
-                    x: Networking.wifiEnabled ? parent.width - width - 2 : 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 14
-                    height: 14
-                    color: theme.fg
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: 6
+                    anchors.rightMargin: 6
+                    spacing: 8
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Wi-Fi"
+                        color: theme.fg
+                        font.family: theme.fontFamily
+                        font.pixelSize: theme.fontSize
+                    }
+
+                    Item {
+                        width: parent.width - 110
+                        height: 1
+                    }
+
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 36
+                        height: 18
+                        color: Networking.wifiEnabled ? theme.accent : theme.border
+
+                        Rectangle {
+                            x: Networking.wifiEnabled ? parent.width - width - 2 : 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 14
+                            height: 14
+                            color: theme.fg
+                        }
+                    }
                 }
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                    hoverEnabled: true
+                    onEntered: root.sel = 0
+                    onClicked: root.activateRow(0)
                 }
             }
-        }
 
-        Text {
-            visible: !root.wifiDev
-            text: "No Wi-Fi device (NetworkManager unavailable)"
-            color: theme.dim
-            font.family: theme.fontFamily
-            font.pixelSize: theme.smallSize
-            wrapMode: Text.Wrap
-            width: parent.width
-        }
-
-        Column {
-            width: parent.width
-            spacing: 2
+            Text {
+                visible: !root.wifiDev
+                text: "No Wi-Fi device (NetworkManager unavailable)"
+                color: theme.dim
+                font.family: theme.fontFamily
+                font.pixelSize: theme.smallSize
+                wrapMode: Text.Wrap
+                width: parent.width
+            }
 
             Repeater {
                 model: root.wifiDev ? root.wifiDev.networks : null
@@ -116,15 +172,18 @@ Item {
                     id: netRow
 
                     required property var modelData
+                    required property int index
 
-                    width: content.width
-                    height: 26
-                    color: netMouse.containsMouse ? theme.hoverBg : "transparent"
+                    width: col.width
+                    height: 28
+                    color: root.sel === index + 1 ? theme.hoverBg : "transparent"
+                    border.width: root.sel === index + 1 ? 1 : 0
+                    border.color: theme.accent
 
                     Row {
                         anchors.fill: parent
-                        anchors.leftMargin: 4
-                        anchors.rightMargin: 4
+                        anchors.leftMargin: 6
+                        anchors.rightMargin: 6
                         spacing: 6
 
                         Text {
@@ -156,55 +215,56 @@ Item {
                     }
 
                     MouseArea {
-                        id: netMouse
-
                         anchors.fill: parent
                         hoverEnabled: true
+                        onEntered: root.sel = netRow.index + 1
                         onClicked: root.activateNetwork(netRow.modelData)
                     }
                 }
             }
-        }
 
-        Column {
-            visible: root.pending !== null
-            width: parent.width
-            spacing: 4
-
-            Text {
-                text: "Password for " + (root.pending ? root.pending.name : "")
-                color: theme.dim
-                font.family: theme.fontFamily
-                font.pixelSize: theme.smallSize
-            }
-
-            Rectangle {
+            Column {
+                visible: root.pending !== null
                 width: parent.width
-                height: 28
-                color: theme.bg
-                border.width: 1
-                border.color: theme.border
+                spacing: 4
 
-                TextInput {
-                    id: password
-
-                    anchors.fill: parent
-                    anchors.leftMargin: 6
-                    anchors.rightMargin: 6
-                    verticalAlignment: TextInput.AlignVCenter
-                    echoMode: TextInput.Password
-                    color: theme.fg
+                Text {
+                    text: "Password for " + (root.pending ? root.pending.name : "")
+                    color: theme.dim
                     font.family: theme.fontFamily
-                    font.pixelSize: theme.fontSize
-                    onAccepted: {
-                        if (root.pending)
-                            root.pending.connectWithPsk(text);
-                        root.pending = null;
-                    }
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Escape) {
+                    font.pixelSize: theme.smallSize
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 28
+                    color: theme.bg
+                    border.width: 1
+                    border.color: theme.border
+
+                    TextInput {
+                        id: password
+
+                        anchors.fill: parent
+                        anchors.leftMargin: 6
+                        anchors.rightMargin: 6
+                        verticalAlignment: TextInput.AlignVCenter
+                        echoMode: TextInput.Password
+                        color: theme.fg
+                        font.family: theme.fontFamily
+                        font.pixelSize: theme.fontSize
+                        onAccepted: {
+                            if (root.pending)
+                                root.pending.connectWithPsk(text);
                             root.pending = null;
-                            event.accepted = true;
+                            root.wantFocus();
+                        }
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Escape) {
+                                root.pending = null;
+                                root.wantFocus();
+                                event.accepted = true;
+                            }
                         }
                     }
                 }

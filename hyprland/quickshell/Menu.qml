@@ -5,11 +5,11 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import Quickshell.Widgets
 
-// Spotlight-style menu toggled with `qs ipc call menu toggle`:
+// Spotlight-style launcher toggled with `qs ipc call menu toggle`:
 //   - launch apps (DesktopEntries)
 //   - focus open windows (Hyprland toplevels)
 //   - calculator via qalc (type e.g. "2+3*4" or "10 km to miles", Enter copies)
-//   - toggleable panels: wifi, sound, power profile, bluetooth, keybinds
+// System controls live in the ControlCenter (bar ≡ button / Super+/).
 PanelWindow {
     id: root
 
@@ -31,41 +31,6 @@ PanelWindow {
         id: theme
     }
 
-    PersistentProperties {
-        id: persist
-
-        reloadableId: "menu-panels"
-        property bool wifi: false
-        property bool sound: false
-        property bool power: false
-        property bool bluetooth: false
-        property bool keys: false
-    }
-
-    property var panels: [
-        {
-            "id": "wifi",
-            "label": "Wi-Fi"
-        },
-        {
-            "id": "sound",
-            "label": "Sound"
-        },
-        {
-            "id": "power",
-            "label": "Power"
-        },
-        {
-            "id": "bluetooth",
-            "label": "Bluetooth"
-        },
-        {
-            "id": "keys",
-            "label": "Keys"
-        },
-    ]
-    readonly property bool anyPanel: persist.wifi || persist.sound || persist.power || persist.bluetooth || persist.keys
-
     property var entries: []
     property int sel: 0
     property string calcResult: ""
@@ -74,6 +39,13 @@ PanelWindow {
     function iconForId(appId) {
         const entry = appId ? DesktopEntries.heuristicLookup(appId) : null;
         return Quickshell.iconPath(entry && entry.icon ? entry.icon : "application-x-executable");
+    }
+
+    // HyprlandToplevel.address has no 0x prefix; hyprctl needs one.
+    function normAddr(address) {
+        if (!address)
+            return "";
+        return address.startsWith("0x") ? address : "0x" + address;
     }
 
     function rebuild() {
@@ -123,15 +95,13 @@ PanelWindow {
         if (entry.type === "calc")
             Quickshell.execDetached(["wl-copy", entry.name]);
         else if (entry.type === "window")
-            Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ window = \"address:" + entry.address + "\" })"]);
+            Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ window = \"address:" + root.normAddr(entry.address) + "\" })"]);
         else if (entry.type === "app" && entry.entry)
             entry.entry.execute();
         root.closeMenu();
     }
 
-    function openMenu(panel) {
-        if (panel && persist.hasOwnProperty(panel))
-            persist[panel] = true;
+    function openMenu() {
         root.visible = true;
         search.text = "";
         root.calcResult = "";
@@ -196,11 +166,11 @@ PanelWindow {
             if (root.visible)
                 root.closeMenu();
             else
-                root.openMenu("");
+                root.openMenu();
         }
 
-        function open(panel: string): void {
-            root.openMenu(panel);
+        function open(): void {
+            root.openMenu();
         }
 
         function close(): void {
@@ -214,7 +184,7 @@ PanelWindow {
 
         Rectangle {
             anchors.centerIn: parent
-            width: root.anyPanel ? 1020 : 680
+            width: 680
             height: 600
             color: theme.panelBg
             border.width: 1
@@ -229,43 +199,6 @@ PanelWindow {
                 anchors.margins: 12
                 spacing: 10
 
-                // Panel toggles
-                Row {
-                    spacing: 6
-
-                    Repeater {
-                        model: root.panels
-
-                        delegate: Rectangle {
-                            id: toggle
-
-                            required property var modelData
-
-                            width: toggleLabel.implicitWidth + 16
-                            height: 24
-                            color: persist[modelData.id] ? theme.hoverBg : "transparent"
-                            border.width: 1
-                            border.color: persist[modelData.id] ? theme.accent : theme.border
-
-                            Text {
-                                id: toggleLabel
-
-                                anchors.centerIn: parent
-                                text: toggle.modelData.label
-                                color: persist[toggle.modelData.id] ? theme.fg : theme.dim
-                                font.family: theme.fontFamily
-                                font.pixelSize: theme.smallSize
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: persist[toggle.modelData.id] = !persist[toggle.modelData.id]
-                            }
-                        }
-                    }
-                }
-
-                // Search
                 TextInput {
                     id: search
 
@@ -311,110 +244,67 @@ PanelWindow {
                     color: theme.border
                 }
 
-                Row {
+                ListView {
+                    id: results
+
                     width: parent.width
-                    height: parent.height - 110
-                    spacing: 12
+                    height: parent.height - 52
+                    clip: true
+                    model: root.entries
+                    currentIndex: root.sel
 
-                    // Results
-                    ListView {
-                        id: results
+                    delegate: Rectangle {
+                        id: row
 
-                        width: root.anyPanel ? parent.width - 332 : parent.width
-                        height: parent.height
-                        clip: true
-                        model: root.entries
-                        currentIndex: root.sel
+                        required property var modelData
+                        required property int index
 
-                        delegate: Rectangle {
-                            id: row
+                        width: results.width
+                        height: 36
+                        color: index === root.sel ? theme.hoverBg : "transparent"
 
-                            required property var modelData
-                            required property int index
+                        Row {
+                            anchors.fill: parent
+                            anchors.leftMargin: 6
+                            anchors.rightMargin: 6
+                            spacing: 8
 
-                            width: results.width
-                            height: 36
-                            color: index === root.sel ? theme.hoverBg : "transparent"
-
-                            Row {
-                                anchors.fill: parent
-                                anchors.leftMargin: 6
-                                anchors.rightMargin: 6
-                                spacing: 8
-
-                                IconImage {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    implicitSize: 18
-                                    source: row.modelData.type === "app" && row.modelData.icon ? Quickshell.iconPath(row.modelData.icon) : (row.modelData.icon || "")
-                                }
-
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width - 30
-
-                                    Text {
-                                        width: parent.width
-                                        text: row.modelData.name
-                                        color: theme.fg
-                                        font.family: theme.fontFamily
-                                        font.pixelSize: theme.fontSize
-                                        elide: Text.ElideRight
-                                    }
-
-                                    Text {
-                                        width: parent.width
-                                        visible: row.modelData.sub !== ""
-                                        text: row.modelData.sub
-                                        color: theme.dim
-                                        font.family: theme.fontFamily
-                                        font.pixelSize: theme.smallSize
-                                        elide: Text.ElideRight
-                                    }
-                                }
+                            IconImage {
+                                anchors.verticalCenter: parent.verticalCenter
+                                implicitSize: 18
+                                source: row.modelData.type === "app" && row.modelData.icon ? Quickshell.iconPath(row.modelData.icon) : (row.modelData.icon || "")
                             }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onEntered: root.sel = row.index
-                                onClicked: root.activate(row.modelData)
+                            Column {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width - 30
+
+                                Text {
+                                    width: parent.width
+                                    text: row.modelData.name
+                                    color: theme.fg
+                                    font.family: theme.fontFamily
+                                    font.pixelSize: theme.fontSize
+                                    elide: Text.ElideRight
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    visible: row.modelData.sub !== ""
+                                    text: row.modelData.sub
+                                    color: theme.dim
+                                    font.family: theme.fontFamily
+                                    font.pixelSize: theme.smallSize
+                                    elide: Text.ElideRight
+                                }
                             }
                         }
-                    }
 
-                    // Panels
-                    Column {
-                        visible: root.anyPanel
-                        width: 320
-                        height: parent.height
-                        spacing: 12
-
-                        WifiPanel {
-                            visible: persist.wifi
-                            shown: persist.wifi
-                            width: parent.width
-                        }
-
-                        SoundPanel {
-                            visible: persist.sound
-                            width: parent.width
-                        }
-
-                        PowerPanel {
-                            visible: persist.power
-                            shown: persist.power
-                            width: parent.width
-                        }
-
-                        BluetoothPanel {
-                            visible: persist.bluetooth
-                            shown: persist.bluetooth
-                            width: parent.width
-                        }
-
-                        KeysPanel {
-                            visible: persist.keys
-                            width: parent.width
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onEntered: root.sel = row.index
+                            onClicked: root.activate(row.modelData)
                         }
                     }
                 }

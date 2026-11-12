@@ -4,16 +4,19 @@ import Quickshell.Services.Pipewire
 Item {
     id: root
 
+    property bool active: false
+    property int sel: 0
+
     Theme {
         id: theme
     }
-
-    implicitHeight: content.implicitHeight
 
     property var sinks: Pipewire.nodes.values.filter(n => n.isSink && n.audio && !n.isStream)
     property var sources: Pipewire.nodes.values.filter(n => !n.isSink && n.audio && !n.isStream)
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
+
+    property var rows: []
 
     PwObjectTracker {
         objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource].filter(n => n !== null)
@@ -23,179 +26,204 @@ Item {
         return node.description || node.nickname || node.name || "";
     }
 
-    Column {
-        id: content
-
-        width: parent.width
-        spacing: 6
-
-        Text {
-            text: "Sound"
-            color: theme.fg
-            font.family: theme.fontFamily
-            font.pixelSize: theme.fontSize
-            font.bold: true
+    function rebuildRows() {
+        const r = [];
+        if (sink) {
+            r.push({
+                "kind": "vol",
+                "io": "out",
+                "node": sink
+            });
+            r.push({
+                "kind": "mute",
+                "io": "out",
+                "node": sink
+            });
         }
-
-        Text {
-            text: "Output"
-            color: theme.dim
-            font.family: theme.fontFamily
-            font.pixelSize: theme.smallSize
+        for (const n of sinks)
+            r.push({
+                "kind": "dev",
+                "io": "out",
+                "node": n
+            });
+        if (source) {
+            r.push({
+                "kind": "vol",
+                "io": "in",
+                "node": source
+            });
+            r.push({
+                "kind": "mute",
+                "io": "in",
+                "node": source
+            });
         }
+        for (const n of sources)
+            r.push({
+                "kind": "dev",
+                "io": "in",
+                "node": n
+            });
+        rows = r;
+        sel = Math.max(0, Math.min(sel, rows.length - 1));
+    }
 
-        Row {
-            width: parent.width
-            spacing: 8
+    function ensureVisible() {
+        const y = sel * 30;
+        if (y < flick.contentY)
+            flick.contentY = y;
+        else if (y + 30 > flick.contentY + flick.height)
+            flick.contentY = y + 30 - flick.height;
+    }
 
-            Rectangle {
-                width: 24
-                height: 24
-                color: root.sink && root.sink.audio.muted ? theme.accent : "transparent"
-                border.width: 1
-                border.color: theme.border
+    function navMove(d) {
+        sel += d;
+        sel = Math.max(0, Math.min(sel, rows.length - 1));
+        ensureVisible();
+    }
 
-                Text {
-                    anchors.centerIn: parent
-                    text: "M"
-                    color: theme.fg
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.smallSize
-                }
+    function navActivate() {
+        activateRow(sel);
+    }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (root.sink)
-                            root.sink.audio.muted = !root.sink.audio.muted;
-                    }
-                }
-            }
+    function navAdjust(d) {
+        const row = rows[sel];
+        if (!row)
+            return;
+        if (row.kind === "vol")
+            row.node.audio.volume = Math.max(0, Math.min(1, row.node.audio.volume + d * 0.05));
+        else
+            activateRow(sel);
+    }
 
-            VolumeSlider {
-                width: parent.width - 76
-                anchors.verticalCenter: parent.verticalCenter
-                value: root.sink ? root.sink.audio.volume : 0
-                onMoved: v => {
-                    if (root.sink)
-                        root.sink.audio.volume = v;
-                }
-            }
+    function activateRow(i) {
+        const row = rows[i];
+        if (!row)
+            return;
+        if (row.kind === "mute")
+            row.node.audio.muted = !row.node.audio.muted;
+        else if (row.kind === "dev") {
+            if (row.io === "out")
+                Pipewire.preferredDefaultAudioSink = row.node;
+            else
+                Pipewire.preferredDefaultAudioSource = row.node;
+        } else if (row.kind === "vol")
+            row.node.audio.muted = !row.node.audio.muted;
+    }
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 36
-                text: root.sink ? Math.round(root.sink.audio.volume * 100) + "%" : ""
-                color: theme.dim
-                font.family: theme.fontFamily
-                font.pixelSize: theme.smallSize
-            }
-        }
+    onSinksChanged: rebuildRows()
+    onSourcesChanged: rebuildRows()
+    onSinkChanged: rebuildRows()
+    onSourceChanged: rebuildRows()
+    onActiveChanged: {
+        if (active)
+            rebuildRows();
+    }
+    Component.onCompleted: rebuildRows()
+
+    Flickable {
+        id: flick
+
+        anchors.fill: parent
+        clip: true
+        contentHeight: col.implicitHeight
 
         Column {
+            id: col
+
             width: parent.width
             spacing: 2
 
             Repeater {
-                model: root.sinks
+                model: root.rows
 
-                delegate: Text {
-                    id: sinkRow
+                delegate: Rectangle {
+                    id: rowItem
 
                     required property var modelData
+                    required property int index
 
-                    width: content.width
-                    text: (modelData === Pipewire.defaultAudioSink ? "▸ " : "  ") + root.deviceLabel(modelData)
-                    color: modelData === Pipewire.defaultAudioSink ? theme.accent : theme.dim
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.smallSize
-                    elide: Text.ElideRight
+                    width: col.width
+                    height: 28
+                    color: root.sel === index ? theme.hoverBg : "transparent"
+                    border.width: root.sel === index ? 1 : 0
+                    border.color: theme.accent
+
+                    // Volume row
+                    Row {
+                        visible: rowItem.modelData.kind === "vol"
+                        anchors.fill: parent
+                        anchors.leftMargin: 6
+                        anchors.rightMargin: 6
+                        spacing: 8
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 52
+                            text: rowItem.modelData.io === "out" ? "Output" : "Input"
+                            color: theme.fg
+                            font.family: theme.fontFamily
+                            font.pixelSize: theme.smallSize
+                        }
+
+                        VolumeSlider {
+                            id: volVis
+
+                            width: parent.width - 110
+                            anchors.verticalCenter: parent.verticalCenter
+                            enabled: false
+                            value: rowItem.modelData.node.audio.volume
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 36
+                            text: Math.round(rowItem.modelData.node.audio.volume * 100) + "%"
+                            color: theme.dim
+                            font.family: theme.fontFamily
+                            font.pixelSize: theme.smallSize
+                        }
+                    }
+
+                    // Mute row
+                    Text {
+                        visible: rowItem.modelData.kind === "mute"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 6
+                        text: (rowItem.modelData.io === "out" ? "Output" : "Input") + " mute: " + (rowItem.modelData.node.audio.muted ? "on" : "off")
+                        color: theme.fg
+                        font.family: theme.fontFamily
+                        font.pixelSize: theme.smallSize
+                    }
+
+                    // Device row
+                    Text {
+                        visible: rowItem.modelData.kind === "dev"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 6
+                        width: parent.width - 12
+                        text: ((rowItem.modelData.io === "out" ? rowItem.modelData.node === Pipewire.defaultAudioSink : rowItem.modelData.node === Pipewire.defaultAudioSource) ? "▸ " : "  ") + root.deviceLabel(rowItem.modelData.node)
+                        color: (rowItem.modelData.io === "out" ? rowItem.modelData.node === Pipewire.defaultAudioSink : rowItem.modelData.node === Pipewire.defaultAudioSource) ? theme.accent : theme.dim
+                        font.family: theme.fontFamily
+                        font.pixelSize: theme.smallSize
+                        elide: Text.ElideRight
+                    }
 
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: Pipewire.preferredDefaultAudioSink = sinkRow.modelData
-                    }
-                }
-            }
-        }
-
-        Text {
-            text: "Input"
-            color: theme.dim
-            font.family: theme.fontFamily
-            font.pixelSize: theme.smallSize
-        }
-
-        Row {
-            width: parent.width
-            spacing: 8
-
-            Rectangle {
-                width: 24
-                height: 24
-                color: root.source && root.source.audio.muted ? theme.accent : "transparent"
-                border.width: 1
-                border.color: theme.border
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "M"
-                    color: theme.fg
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.smallSize
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (root.source)
-                            root.source.audio.muted = !root.source.audio.muted;
-                    }
-                }
-            }
-
-            VolumeSlider {
-                width: parent.width - 76
-                anchors.verticalCenter: parent.verticalCenter
-                value: root.source ? root.source.audio.volume : 0
-                onMoved: v => {
-                    if (root.source)
-                        root.source.audio.volume = v;
-                }
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 36
-                text: root.source ? Math.round(root.source.audio.volume * 100) + "%" : ""
-                color: theme.dim
-                font.family: theme.fontFamily
-                font.pixelSize: theme.smallSize
-            }
-        }
-
-        Column {
-            width: parent.width
-            spacing: 2
-
-            Repeater {
-                model: root.sources
-
-                delegate: Text {
-                    id: sourceRow
-
-                    required property var modelData
-
-                    width: content.width
-                    text: (modelData === Pipewire.defaultAudioSource ? "▸ " : "  ") + root.deviceLabel(modelData)
-                    color: modelData === Pipewire.defaultAudioSource ? theme.accent : theme.dim
-                    font.family: theme.fontFamily
-                    font.pixelSize: theme.smallSize
-                    elide: Text.ElideRight
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: Pipewire.preferredDefaultAudioSource = sourceRow.modelData
+                        hoverEnabled: true
+                        onEntered: root.sel = rowItem.index
+                        onClicked: mouse => {
+                            root.sel = rowItem.index;
+                            if (rowItem.modelData.kind === "vol") {
+                                const row = rowItem.modelData;
+                                row.node.audio.volume = Math.max(0, Math.min(1, (mouse.x - 66) / (rowItem.width - 124)));
+                            } else {
+                                root.activateRow(rowItem.index);
+                            }
+                        }
                     }
                 }
             }

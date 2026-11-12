@@ -4,79 +4,130 @@ import Quickshell.Bluetooth
 Item {
     id: root
 
-    property bool shown: false
+    property bool active: false
+    property int sel: 0
 
     Theme {
         id: theme
     }
 
-    implicitHeight: content.implicitHeight
-
     readonly property var adapter: Bluetooth.defaultAdapter
+    readonly property int rowCount: 1 + Bluetooth.devices.values.length
 
-    onShownChanged: {
-        if (shown && adapter && adapter.enabled)
+    function ensureVisible() {
+        const y = sel * 30;
+        if (y < flick.contentY)
+            flick.contentY = y;
+        else if (y + 30 > flick.contentY + flick.height)
+            flick.contentY = y + 30 - flick.height;
+    }
+
+    function navMove(d) {
+        sel = Math.max(0, Math.min(sel + d, rowCount - 1));
+        ensureVisible();
+    }
+
+    function navActivate() {
+        activateRow(sel);
+    }
+
+    function navAdjust(d) {
+        activateRow(sel);
+    }
+
+    function activateRow(i) {
+        if (i === 0) {
+            if (adapter)
+                adapter.enabled = !adapter.enabled;
+            return;
+        }
+        const dev = Bluetooth.devices.values[i - 1];
+        if (!dev)
+            return;
+        if (dev.connected)
+            dev.disconnect();
+        else if (dev.paired)
+            dev.connect();
+        else
+            dev.pair();
+    }
+
+    onActiveChanged: {
+        if (active && adapter && adapter.enabled)
             adapter.discovering = true;
     }
 
-    Column {
-        id: content
+    Flickable {
+        id: flick
 
-        width: parent.width
-        spacing: 6
+        anchors.fill: parent
+        clip: true
+        contentHeight: col.implicitHeight
 
-        Row {
+        Column {
+            id: col
+
             width: parent.width
-            spacing: 8
+            spacing: 2
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Bluetooth"
-                color: theme.fg
-                font.family: theme.fontFamily
-                font.pixelSize: theme.fontSize
-                font.bold: true
-            }
-
-            Item {
-                width: parent.width - 140
-                height: 1
-            }
-
+            // Row 0: adapter toggle
             Rectangle {
-                width: 36
-                height: 18
-                color: root.adapter && root.adapter.enabled ? theme.accent : theme.border
+                width: parent.width
+                height: 28
+                color: root.sel === 0 ? theme.hoverBg : "transparent"
+                border.width: root.sel === 0 ? 1 : 0
+                border.color: theme.accent
 
-                Rectangle {
-                    x: root.adapter && root.adapter.enabled ? parent.width - width - 2 : 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 14
-                    height: 14
-                    color: theme.fg
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: 6
+                    anchors.rightMargin: 6
+                    spacing: 8
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Bluetooth"
+                        color: theme.fg
+                        font.family: theme.fontFamily
+                        font.pixelSize: theme.fontSize
+                    }
+
+                    Item {
+                        width: parent.width - 130
+                        height: 1
+                    }
+
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 36
+                        height: 18
+                        color: root.adapter && root.adapter.enabled ? theme.accent : theme.border
+
+                        Rectangle {
+                            x: root.adapter && root.adapter.enabled ? parent.width - width - 2 : 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 14
+                            height: 14
+                            color: theme.fg
+                        }
+                    }
                 }
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        if (root.adapter)
-                            root.adapter.enabled = !root.adapter.enabled;
-                    }
+                    hoverEnabled: true
+                    onEntered: root.sel = 0
+                    onClicked: root.activateRow(0)
                 }
             }
-        }
 
-        Text {
-            visible: !root.adapter
-            text: "No Bluetooth adapter"
-            color: theme.dim
-            font.family: theme.fontFamily
-            font.pixelSize: theme.smallSize
-        }
-
-        Column {
-            width: parent.width
-            spacing: 2
+            Text {
+                visible: !root.adapter
+                text: "No Bluetooth adapter"
+                color: theme.dim
+                font.family: theme.fontFamily
+                font.pixelSize: theme.smallSize
+            }
 
             Repeater {
                 model: Bluetooth.devices
@@ -85,15 +136,18 @@ Item {
                     id: devRow
 
                     required property var modelData
+                    required property int index
 
-                    width: content.width
-                    height: 26
-                    color: devMouse.containsMouse ? theme.hoverBg : "transparent"
+                    width: col.width
+                    height: 28
+                    color: root.sel === index + 1 ? theme.hoverBg : "transparent"
+                    border.width: root.sel === index + 1 ? 1 : 0
+                    border.color: theme.accent
 
                     Row {
                         anchors.fill: parent
-                        anchors.leftMargin: 4
-                        anchors.rightMargin: 4
+                        anchors.leftMargin: 6
+                        anchors.rightMargin: 6
                         spacing: 6
 
                         Text {
@@ -125,18 +179,10 @@ Item {
                     }
 
                     MouseArea {
-                        id: devMouse
-
                         anchors.fill: parent
                         hoverEnabled: true
-                        onClicked: {
-                            if (devRow.modelData.connected)
-                                devRow.modelData.disconnect();
-                            else if (devRow.modelData.paired)
-                                devRow.modelData.connect();
-                            else
-                                devRow.modelData.pair();
-                        }
+                        onEntered: root.sel = devRow.index + 1
+                        onClicked: root.activateRow(devRow.index + 1)
                     }
                 }
             }

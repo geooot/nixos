@@ -59,7 +59,6 @@ hl.config({
     },
     animations = { enabled = true },
     dwindle = {
-        pseudotile = true,
         preserve_split = true,
     },
     scrolling = {
@@ -71,7 +70,6 @@ hl.config({
     misc = {
         disable_hyprland_logo = true,
         disable_splash_rendering = true,
-        vfr = true,
     },
     xwayland = { force_zero_scaling = true },
 })
@@ -178,7 +176,7 @@ local function set_mode(ws, mode)
     end
     modes[ws.id] = mode
     save_modes()
-    hl.exec_cmd('notify-send -t 1200 "Workspace layout" "' .. (mode_labels[mode] or mode) .. '"')
+    hl.exec_cmd('notify-send -t 1200 -r 69 "Workspace layout" "' .. (mode_labels[mode] or mode) .. '"')
 end
 
 function CycleWorkspaceLayout(dir)
@@ -208,11 +206,38 @@ end)
 
 -----------------------------------------
 ---- MINIMIZE (Omarchy-style) ----
----- Super+M on floating workspaces only; window is parked on
+---- Super+Shift+H minimizes from any workspace mode; window is parked on
 ---- special:minimized and tagged with its origin workspace.
 ---- Restore by clicking its icon in the bar (hypr-restore)
 ---- or Super+Alt+M for the most recent one.
 -----------------------------------------
+
+local function park_window(w)
+    local ws = w.workspace
+    if ws == nil or ws.id < 0 then
+        return
+    end
+    hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+minimized-from-" .. ws.id }))
+    hl.dispatch(hl.dsp.window.move({ window = w, workspace = "special:minimized", follow = false }))
+end
+
+local function restore_window(w)
+    local origin = nil
+    for _, t in ipairs(w.tags or {}) do
+        origin = string.match(t, "^minimized%-from%-(%d+)$") or origin
+    end
+    local target = origin or tostring(hl.get_active_workspace().id)
+    hl.dispatch(hl.dsp.window.move({ window = w, workspace = target, follow = true }))
+    if origin ~= nil then
+        hl.dispatch(hl.dsp.window.tag({ window = w, tag = "-minimized-from-" .. origin }))
+    end
+    if modes[tonumber(target)] == "floating" then
+        hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
+    else
+        hl.dispatch(hl.dsp.window.float({ window = w, action = "disable" }))
+    end
+    hl.dispatch(hl.dsp.focus({ window = w }))
+end
 
 function MinimizeWindow()
     local w = hl.get_active_window()
@@ -220,14 +245,10 @@ function MinimizeWindow()
     if w == nil or ws == nil or ws.id < 0 then
         return
     end
-    if mode_of(ws) ~= "floating" then
-        return
-    end
     if w.fullscreen ~= 0 then
         return
     end
-    hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+minimized-from-" .. ws.id }))
-    hl.dispatch(hl.dsp.window.move({ window = w, workspace = "special:minimized", follow = false }))
+    park_window(w)
 end
 
 function RestoreLastMinimized()
@@ -250,22 +271,111 @@ function RestoreLastMinimized()
             best = w
         end
     end
-    local origin = nil
-    for _, t in ipairs(best.tags or {}) do
-        origin = string.match(t, "^minimized%-from%-(%d+)$") or origin
-    end
-    local target = origin or tostring(hl.get_active_workspace().id)
-    hl.dispatch(hl.dsp.window.move({ window = best, workspace = target, follow = true }))
-    if origin ~= nil then
-        hl.dispatch(hl.dsp.window.tag({ window = best, tag = "-minimized-from-" .. origin }))
-    end
-    if modes[tonumber(target)] == "floating" then
-        hl.dispatch(hl.dsp.window.float({ window = best, action = "enable" }))
-    else
-        hl.dispatch(hl.dsp.window.float({ window = best, action = "disable" }))
-    end
-    hl.dispatch(hl.dsp.focus({ window = best }))
+    restore_window(best)
 end
+
+-- Apps with their own minimize button (CSD) ask the compositor to
+-- minimize them. Park them like Super+Shift+H does, but on any workspace;
+-- if the app later asks to be unminimized while parked, restore it.
+hl.on("window.minimize", function(w, minimized)
+    if w == nil or w.workspace == nil then
+        return
+    end
+    if minimized then
+        if w.workspace.name ~= "special:minimized" and w.fullscreen == 0 then
+            park_window(w)
+        end
+    elseif w.workspace.name == "special:minimized" then
+        restore_window(w)
+    end
+end)
+
+--------------------------------------
+---- EDGE SNAPPING ----
+---- Super+Alt+Left/Right snaps the focused floating window to
+---- that half of the work area; pressing it again restores the
+---- window's previous size and position.
+--------------------------------------
+
+local snapped = {}
+
+local function work_area(mon)
+    local scale = mon.scale or 1
+    local res = mon.reserved or {}
+    local rleft = res.left or 0
+    local rtop = res.top or 0
+    return {
+        x = mon.x + rleft,
+        y = mon.y + rtop,
+        w = mon.width / scale - rleft - (res.right or 0),
+        h = mon.height / scale - rtop - (res.bottom or 0),
+    }
+end
+
+local function side_rect(w, side)
+    local mon = w.monitor or hl.get_monitor_at_cursor()
+    if mon == nil then
+        return nil
+    end
+    local wa = work_area(mon)
+    local gap = 4
+    local half = math.floor(wa.w / 2)
+    if side == "left" then
+        return { x = wa.x + gap, y = wa.y + gap, w = half - gap - 2, h = wa.h - gap * 2 }
+    end
+    return { x = wa.x + half + 2, y = wa.y + gap, w = wa.w - half - gap - 2, h = wa.h - gap * 2 }
+end
+
+local function apply_rect(w, r)
+    hl.dispatch(hl.dsp.window.resize({ window = w, x = r.w, y = r.h }))
+    hl.dispatch(hl.dsp.window.move({ window = w, x = r.x, y = r.y }))
+end
+
+local function rect_matches(w, r)
+    return math.abs(w.at.x - r.x) <= 2 and math.abs(w.at.y - r.y) <= 2 and math.abs(w.size.x - r.w) <= 2 and math.abs(w.size.y - r.h) <= 2
+end
+
+local function snap_to(w, side, saved)
+    local r = side_rect(w, side)
+    if r == nil then
+        return
+    end
+    if snapped[w.address] == nil then
+        snapped[w.address] = saved or { x = w.at.x, y = w.at.y, w = w.size.x, h = w.size.y }
+    end
+    apply_rect(w, r)
+end
+
+local function unsnap(w)
+    local saved = snapped[w.address]
+    if saved == nil then
+        return
+    end
+    snapped[w.address] = nil
+    apply_rect(w, saved)
+end
+
+function SnapWindow(side)
+    local w = hl.get_active_window()
+    if w == nil or not w.floating or w.fullscreen ~= 0 then
+        return
+    end
+    local r = side_rect(w, side)
+    if r == nil then
+        return
+    end
+    if snapped[w.address] ~= nil and rect_matches(w, r) then
+        unsnap(w)
+    else
+        snap_to(w, side, nil)
+    end
+end
+
+hl.on("window.destroy", function(w)
+    if w ~= nil then
+        snapped[w.address] = nil
+    end
+end)
 
 --------------------------------------
 ---- LAYOUT-AWARE NAVIGATION ----
@@ -353,7 +463,7 @@ hl.bind(M .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(M .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(M .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(M .. " + space", hl.dsp.exec_cmd(quickshell .. " ipc call menu toggle"))
-hl.bind(M .. " + slash", hl.dsp.exec_cmd(quickshell .. " ipc call menu open keys"))
+hl.bind(M .. " + slash", hl.dsp.exec_cmd(quickshell .. " ipc call control toggle"))
 hl.bind(M .. " + Q", hl.dsp.window.close())
 hl.bind(M .. " + SHIFT + Q", hl.dsp.exec_cmd(locker))
 hl.bind(M .. " + Escape", hl.dsp.exec_cmd(locker))
@@ -361,11 +471,13 @@ hl.bind(M .. " + Escape", hl.dsp.exec_cmd(locker))
 -- Workspace layout + window state
 hl.bind(M .. " + Y", function() CycleWorkspaceLayout(1) end)
 hl.bind(M .. " + SHIFT + Y", function() CycleWorkspaceLayout(-1) end)
-hl.bind(M .. " + M", function() MinimizeWindow() end)
+hl.bind(M .. " + SHIFT + H", function() MinimizeWindow() end)
 hl.bind(M .. " + ALT + M", function() RestoreLastMinimized() end)
 hl.bind(M .. " + SHIFT + M", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(M .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
-hl.bind(M .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+hl.bind(M .. " + ALT + left", function() SnapWindow("left") end)
+hl.bind(M .. " + ALT + right", function() SnapWindow("right") end)
+hl.bind(M .. " + M", hl.dsp.window.fullscreen({ mode = "maximized" }))
+hl.bind(M .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(M .. " + P", hl.dsp.window.pseudo())
 
 -- Focus (vim + arrows)
@@ -456,6 +568,14 @@ hl.window_rule({
     float = true,
     size = { 800, 600 },
     center = true,
+})
+
+-- Ignore client maximize requests (e.g. kitty asks to start maximized,
+-- which Hyprland would otherwise honor as a fullscreen=1 window).
+hl.window_rule({
+    name = "suppress-maximize-events",
+    match = { class = ".*" },
+    suppress_event = "maximize",
 })
 
 -------------------
