@@ -217,14 +217,21 @@ local function park_window(w)
     if ws == nil or ws.id < 0 then
         return
     end
+    if w.fullscreen ~= 0 then
+        -- Remember the fullscreen mode so restore can re-apply it.
+        hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+minimized-fs-" .. w.fullscreen }))
+        hl.dispatch(hl.dsp.window.fullscreen({ window = w, mode = w.fullscreen == 2 and "fullscreen" or "maximized", action = "unset" }))
+    end
     hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+minimized-from-" .. ws.id }))
     hl.dispatch(hl.dsp.window.move({ window = w, workspace = "special:minimized", follow = false }))
 end
 
 local function restore_window(w)
     local origin = nil
+    local fs_mode = nil
     for _, t in ipairs(w.tags or {}) do
         origin = string.match(t, "^minimized%-from%-(%d+)$") or origin
+        fs_mode = string.match(t, "^minimized%-fs%-(%d)$") or fs_mode
     end
     local target = origin or tostring(hl.get_active_workspace().id)
     hl.dispatch(hl.dsp.window.move({ window = w, workspace = target, follow = true }))
@@ -236,6 +243,10 @@ local function restore_window(w)
     else
         hl.dispatch(hl.dsp.window.float({ window = w, action = "disable" }))
     end
+    if fs_mode ~= nil then
+        hl.dispatch(hl.dsp.window.tag({ window = w, tag = "-minimized-fs-" .. fs_mode }))
+        hl.dispatch(hl.dsp.window.fullscreen({ window = w, mode = fs_mode == "2" and "fullscreen" or "maximized", action = "set" }))
+    end
     hl.dispatch(hl.dsp.focus({ window = w }))
 end
 
@@ -243,9 +254,6 @@ function MinimizeWindow()
     local w = hl.get_active_window()
     local ws = hl.get_active_workspace()
     if w == nil or ws == nil or ws.id < 0 then
-        return
-    end
-    if w.fullscreen ~= 0 then
         return
     end
     park_window(w)
@@ -282,7 +290,7 @@ hl.on("window.minimize", function(w, minimized)
         return
     end
     if minimized then
-        if w.workspace.name ~= "special:minimized" and w.fullscreen == 0 then
+        if w.workspace.name ~= "special:minimized" then
             park_window(w)
         end
     elseif w.workspace.name == "special:minimized" then

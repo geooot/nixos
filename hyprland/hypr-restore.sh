@@ -20,6 +20,7 @@ if [ "$addr" = "last" ]; then
 fi
 
 origin_tag=$(printf '%s' "$clients" | jq -r --arg a "$addr" '.[] | select(.address == $a) | [.tags[]? | select(startswith("minimized-from-")) | ltrimstr("minimized-from-")] | first // empty')
+fs_tag=$(printf '%s' "$clients" | jq -r --arg a "$addr" '.[] | select(.address == $a) | [.tags[]? | select(startswith("minimized-fs-")) | ltrimstr("minimized-fs-")] | first // empty')
 origin="$origin_tag"
 if [ -z "$origin" ]; then
   origin=$(hyprctl activeworkspace -j | jq -r '.id')
@@ -35,6 +36,15 @@ if [ "$mode" = "floating" ]; then
   batch="$batch;dispatch hl.dsp.window.float({ window = \"address:$addr\", action = \"enable\" })"
 else
   batch="$batch;dispatch hl.dsp.window.float({ window = \"address:$addr\", action = \"disable\" })"
+fi
+if [ -n "$fs_tag" ]; then
+  if [ "$fs_tag" = "2" ]; then
+    fs_mode="fullscreen"
+  else
+    fs_mode="maximized"
+  fi
+  batch="$batch;dispatch hl.dsp.window.fullscreen({ window = \"address:$addr\", mode = \"$fs_mode\", action = \"set\" })"
+  batch="$batch;dispatch hl.dsp.window.tag({ window = \"address:$addr\", tag = \"-minimized-fs-$fs_tag\" })"
 fi
 batch="$batch;dispatch hl.dsp.focus({ window = \"address:$addr\" })"
 if [ -n "$origin_tag" ]; then
