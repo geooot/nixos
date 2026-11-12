@@ -24,6 +24,7 @@ in
     libqalculate # qalc, used by the menu calculator
     jq # used by hypr-restore
     hyprshot
+    hyprshell # Super+Tab window switcher daemon
     wl-clipboard # wl-copy, used to copy calculator results
   ];
 
@@ -38,6 +39,7 @@ in
     yazi = "${pkgs.yazi}/bin/yazi";
     hyprlock = "${pkgs.hyprlock}/bin/hyprlock";
     quickshell = "${pkgs.quickshell}/bin/qs";
+    hyprshell = "${pkgs.hyprshell}/bin/hyprshell";
     hyprshot = "${pkgs.hyprshot}/bin/hyprshot";
     awwwDaemon = "${pkgs.awww}/bin/awww-daemon";
     dunst = "${pkgs.dunst}/bin/dunst";
@@ -76,6 +78,22 @@ in
   xdg.configFile."quickshell/BluetoothPanel.qml".source = ./quickshell/BluetoothPanel.qml;
   xdg.configFile."quickshell/KeysPanel.qml".source = ./quickshell/KeysPanel.qml;
   xdg.configFile."quickshell/VolumeSlider.qml".source = ./quickshell/VolumeSlider.qml;
+
+  xdg.configFile."hyprshell/config.ron".source = ./hyprshell/config.ron;
+
+  # Hyprshell theme, matching the bar (black, square, stylix accent).
+  xdg.configFile."hyprshell/styles.css".text = ''
+    :root {
+        --bg-window-color: rgba(0, 0, 0, 0.95);
+        --bg-color: rgba(10, 10, 10, 0.95);
+        --bg-color-hover: #1a1a1a;
+        --border-color: #323232;
+        --border-color-active: #${accent};
+        --border-radius: 0px;
+        --border-size: 1px;
+        --border-style: solid;
+    }
+  '';
 
   # Icon theme for Quickshell's icon lookups (bar, launcher, tray).
   gtk = {

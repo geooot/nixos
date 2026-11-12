@@ -1,0 +1,21 @@
+// Hyprshell: Super+Tab window switcher only (overview/launcher disabled,
+// the Quickshell menu covers those). Hold Super, Tab / Shift+Tab to cycle
+// most-recently-used windows, release Super to focus. Q kills the
+// selected window while switching.
+// Edit with `hyprshell config edit`
+(
+    version: 4,
+    windows: (
+        scale: 7.0,
+        items_per_row: 5,
+        switch: (
+            modifier: "super",
+            key: "Tab",
+            filter_by: [],
+            switch_workspaces: false,
+            exclude_workspaces: "special:*",
+            kill_key: 'q',
+        ),
+        switch_2: None,
+    ),
+)

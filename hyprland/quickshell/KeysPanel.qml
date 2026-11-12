@@ -14,6 +14,8 @@ Item {
         ["Super+B", "Browser"],
         ["Super+E", "Files (yazi)"],
         ["Super+Space", "Menu (apps / windows / calc)"],
+        ["Super+Tab / +Shift+Tab", "Switch window (release Super)"],
+        ["Q (while switching)", "Kill selected window"],
         ["Super+/", "Action center"],
         ["Tab / Shift+Tab", "Switch action-center section"],
         ["Up/Down or K/J", "Select row in section"],

@@ -592,6 +592,7 @@ hl.window_rule({
 
 hl.on("hyprland.start", function()
     hl.exec_cmd(quickshell)
+    hl.exec_cmd("HYPRSHELL_NO_USE_PLUGIN=1 @hyprshell@ run")
     hl.exec_cmd("@awwwDaemon@")
     hl.exec_cmd("@dunst@")
     hl.exec_cmd("@wayvnc@ -g")
