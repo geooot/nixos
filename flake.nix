@@ -82,7 +82,7 @@
           xremap-flake.nixosModules.default
           ./xremap/configuration.nix
           ./tailscale/configuration.nix
-          # ./hyprland/configuration.nix
+          ./hyprland/configuration.nix
           ./sunshine/configuration.nix
           ./niri/configuration.nix
           # ./plasma6/configuration.nix
@@ -138,6 +138,7 @@
           ./systems/vada/hardware-configuration.nix
           ./systems/vada/configuration.nix
           ./obs/configuration.nix
+          ./hyprland/configuration.nix
           ./niri/configuration.nix
           ./tailscale/configuration.nix
           # ./plasma6/configuration.nix
