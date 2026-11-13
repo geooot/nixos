@@ -52,7 +52,7 @@ in
         example = "t3code.dosa.geooot.com";
         description = ''
           Caddy virtual host that reverse-proxies to the T3 Code server (with
-          Cloudflare DNS-01 TLS, like the homelab vhosts). Requires the
+          a security.acme DNS-01 cert, like the homelab vhosts). Requires the
           homelab Caddy setup. When set, keep `host` on loopback.
         '';
       };
@@ -86,12 +86,12 @@ in
     })
 
     (lib.mkIf (cfg.serve.enable && cfg.serve.caddyVhost != null) {
-      services.caddy.virtualHosts.${cfg.serve.caddyVhost}.extraConfig = ''
-        tls {
-          dns cloudflare {$CLOUDFLARE_API_TOKEN}
-        }
-        reverse_proxy 127.0.0.1:${toString cfg.serve.port}
-      '';
+      services.caddy.virtualHosts.${cfg.serve.caddyVhost} = {
+        useACMEHost = cfg.serve.caddyVhost;
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:${toString cfg.serve.port}
+        '';
+      };
     })
   ];
 }

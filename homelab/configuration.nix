@@ -64,19 +64,14 @@ in
 
     cloudflareTokenFile = lib.mkOption {
       type = lib.types.str;
-      default = "/var/lib/caddy-secrets/cloudflare-token";
+      default = "/var/lib/caddy-secrets/cloudflare-token-raw";
       description = ''
-        systemd EnvironmentFile containing a line
-        `CLOUDFLARE_API_TOKEN=<token>` with Cloudflare API access
-        (Zone:DNS:Edit on the base domain). Used by Caddy for DNS-01
-        ACME challenges. Create this file before starting Caddy.
+        Path to a file containing only the raw Cloudflare API token.
+        Used by security.acme (lego's cloudflare DNS provider) for DNS-01
+        challenges via credentialFiles as CLOUDFLARE_DNS_API_TOKEN_FILE.
+        The token needs Zone:Zone:Read and Zone:DNS:Edit on the base
+        domain. Same file as homelab.ddns.apiTokenFile by default.
       '';
-    };
-
-    caddyPluginHash = lib.mkOption {
-      type = lib.types.str;
-      default = "sha256-WWMdpXe+uCE1Lh7Q+jDvCUi++B+Gimy3YR5x+aRG+Yc=";
-      description = "Vendor hash for caddy built with the cloudflare DNS + IP source plugins.";
     };
 
     calibreAdminHash = lib.mkOption {
