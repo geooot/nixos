@@ -69,6 +69,10 @@ in
       defaults = {
         email = cfg.acmeEmail;
         dnsProvider = "cloudflare";
+        # Bypass the system resolver (Tailscale MagicDNS at 100.100.100.100),
+        # which caches the missing _acme-challenge TXT answer and makes
+        # lego's propagation check time out.
+        dnsResolver = "1.1.1.1:53";
         credentialFiles = {
           "CLOUDFLARE_DNS_API_TOKEN_FILE" = cfg.cloudflareTokenFile;
         };
