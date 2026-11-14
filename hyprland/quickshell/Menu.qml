@@ -33,6 +33,8 @@ PanelWindow {
 
     property var entries: []
     property int sel: 0
+    property string entriesKey: ""
+    property point lastMouse: Qt.point(-1, -1)
     property string calcResult: ""
     property string calcExpr: ""
 
@@ -48,8 +50,83 @@ PanelWindow {
         return address.startsWith("0x") ? address : "0x" + address;
     }
 
+    // How well `text` matches query `q` (both lowercase): exact > prefix >
+    // word prefix > substring. 0 means no match.
+    function matchScore(text, q) {
+        if (!text)
+            return 0;
+        const t = text.toLowerCase();
+        if (t === q)
+            return 4;
+        if (t.startsWith(q))
+            return 3;
+        if (t.split(/[^a-z0-9]+/).some(w => w.startsWith(q)))
+            return 2;
+        return t.includes(q) ? 1 : 0;
+    }
+
+    // Name matches always outrank generic name / keyword matches, which
+    // outrank description matches (e.g. "Play this game on Steam").
+    function appScore(app, q) {
+        const name = root.matchScore(app.name, q);
+        if (name > 0)
+            return 100 + name * 10;
+        const generic = root.matchScore(app.genericName, q);
+        if (generic > 0)
+            return 60 + generic * 5;
+        const keyword = Math.max(0, ...(app.keywords || []).map(k => root.matchScore(k, q)));
+        if (keyword > 0)
+            return 40 + keyword * 3;
+        return root.matchScore(app.comment, q) >= 2 ? 10 : 0;
+    }
+
+    function windowScore(title, appId, q) {
+        const s = Math.max(root.matchScore(title, q), root.matchScore(appId, q));
+        return s > 0 ? 100 + s * 10 : 0;
+    }
+
     function rebuild() {
         const q = search.text.trim().toLowerCase();
+        const scored = [];
+        for (const tl of Hyprland.toplevels.values) {
+            if (tl.workspace && tl.workspace.name === "special:minimized")
+                continue;
+            const appId = tl.wayland ? tl.wayland.appId : "";
+            const score = q === "" ? 1 : root.windowScore(tl.title, appId, q);
+            if (score > 0)
+                scored.push({
+                    "score": score,
+                    "rank": 0,
+                    "item": {
+                        "type": "window",
+                        "name": tl.title || appId,
+                        "sub": "Window · " + appId,
+                        "icon": root.iconForId(appId),
+                        "address": tl.address
+                    }
+                });
+        }
+        for (const app of DesktopEntries.applications.values) {
+            if (app.noDisplay)
+                continue;
+            const score = q === "" ? 1 : root.appScore(app, q);
+            if (score > 0)
+                scored.push({
+                    "score": score,
+                    "rank": 1,
+                    "item": {
+                        "type": "app",
+                        "name": app.name,
+                        "sub": app.genericName || app.comment || "",
+                        "icon": app.icon || "",
+                        "entry": app
+                    }
+                });
+        }
+        // Higher score first; on ties windows before apps, then shorter
+        // names (closer matches), then alphabetical.
+        scored.sort((a, b) => b.score - a.score || a.rank - b.rank || (q === "" ? 0 : a.item.name.length - b.item.name.length) || a.item.name.localeCompare(b.item.name));
+
         const out = [];
         if (root.calcResult !== "")
             out.push({
@@ -58,33 +135,16 @@ PanelWindow {
                 "sub": "= " + root.calcExpr,
                 "icon": ""
             });
-        for (const tl of Hyprland.toplevels.values) {
-            if (tl.workspace && tl.workspace.name === "special:minimized")
-                continue;
-            const appId = tl.wayland ? tl.wayland.appId : "";
-            if (q === "" || (tl.title || "").toLowerCase().includes(q) || appId.toLowerCase().includes(q))
-                out.push({
-                    "type": "window",
-                    "name": tl.title || appId,
-                    "sub": "Window · " + appId,
-                    "icon": root.iconForId(appId),
-                    "address": tl.address
-                });
+        for (const s of scored.slice(0, 60))
+            out.push(s.item);
+
+        // Reassigning the model resets the ListView's scroll position, so
+        // skip it when nothing visible changed (Hyprland events fire often).
+        const key = out.map(e => e.type + "\u0001" + e.name + "\u0001" + e.sub + "\u0001" + (e.address || "")).join("\u0002");
+        if (key !== root.entriesKey) {
+            root.entriesKey = key;
+            root.entries = out;
         }
-        const apps = DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name));
-        for (const app of apps) {
-            if (app.noDisplay)
-                continue;
-            if (q === "" || app.name.toLowerCase().includes(q) || (app.genericName || "").toLowerCase().includes(q) || (app.comment || "").toLowerCase().includes(q))
-                out.push({
-                    "type": "app",
-                    "name": app.name,
-                    "sub": app.genericName || app.comment || "",
-                    "icon": app.icon || "",
-                    "entry": app
-                });
-        }
-        root.entries = out.slice(0, 60);
         if (root.sel >= root.entries.length)
             root.sel = Math.max(0, root.entries.length - 1);
     }
@@ -107,6 +167,7 @@ PanelWindow {
         root.calcResult = "";
         root.sel = 0;
         root.rebuild();
+        results.positionViewAtBeginning();
         search.forceActiveFocus();
     }
 
@@ -153,9 +214,12 @@ PanelWindow {
     Connections {
         target: Hyprland
         function onRawEvent(event) {
-            root.rebuild();
+            if (root.visible)
+                root.rebuild();
         }
     }
+
+    onSelChanged: results.positionViewAtIndex(root.sel, ListView.Contain)
 
     Component.onCompleted: root.rebuild()
 
@@ -250,8 +314,8 @@ PanelWindow {
                     width: parent.width
                     height: parent.height - 52
                     clip: true
+                    boundsBehavior: Flickable.StopAtBounds
                     model: root.entries
-                    currentIndex: root.sel
 
                     delegate: Rectangle {
                         id: row
@@ -303,7 +367,16 @@ PanelWindow {
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
-                            onEntered: root.sel = row.index
+                            // Only follow real mouse movement: when the list
+                            // scrolls under a still cursor, rows get hover
+                            // events too, which would steal the keyboard selection.
+                            onPositionChanged: mouse => {
+                                const p = mapToItem(null, mouse.x, mouse.y);
+                                if (p.x === root.lastMouse.x && p.y === root.lastMouse.y)
+                                    return;
+                                root.lastMouse = p;
+                                root.sel = row.index;
+                            }
                             onClicked: root.activate(row.modelData)
                         }
                     }
