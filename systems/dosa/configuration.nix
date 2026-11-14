@@ -253,8 +253,7 @@
   services.displayManager.ly = {
     enable = true;
     settings = {
-      animate = true;
-      animation = "colormix";
+      animate = false;
       hide_borders = true;
       clock = "%c";
       bigclock = true;
