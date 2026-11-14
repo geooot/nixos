@@ -273,7 +273,7 @@
   hardware = {
     graphics.enable = true;
     nvidia = {
-      package = config.boot.kernelPackages.nvidiaPackages.beta;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
 
       # Modesetting is required.
       modesetting.enable = true;
@@ -294,8 +294,9 @@
       # supported GPUs is at:
       # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus
       # Only available from driver 515.43.04+
-      # Currently alpha-quality/buggy, so false is currently the recommended setting.
-      open = false;
+      # Unlike the proprietary module, it's built by Hydra and cached on
+      # cache.nixos.org, so kernel bumps don't force a local rebuild.
+      open = true;
 
       # Enable the Nvidia settings menu,
       # accessible via `nvidia-settings`.

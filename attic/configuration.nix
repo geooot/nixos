@@ -138,7 +138,12 @@ in
           wants = [ "network-online.target" ];
           wantedBy = [ "multi-user.target" ];
           serviceConfig = {
-            Environment = [ "HOME=/root" ];
+            # Go through nix-daemon instead of opening the store directly as
+            # root; a direct open holds big-lock and blocks nixos-rebuild.
+            Environment = [
+              "HOME=/root"
+              "NIX_REMOTE=daemon"
+            ];
             Restart = "on-failure";
             RestartSec = "30";
           };
