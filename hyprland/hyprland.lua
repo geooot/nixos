@@ -148,6 +148,30 @@ end
 local mode_labels = { dwindle = "Tiling", scrolling = "Scrolling", floating = "Floating" }
 local mode_order = { "dwindle", "scrolling", "floating" }
 
+local function work_area(mon)
+  local scale = mon.scale or 1
+  local res = mon.reserved or {}
+  local rleft = res.left or 0
+  local rtop = res.top or 0
+  return {
+    x = mon.x + rleft,
+    y = mon.y + rtop,
+    w = mon.width / scale - rleft - (res.right or 0),
+    h = mon.height / scale - rtop - (res.bottom or 0),
+  }
+end
+
+local function is_offscreen(w)
+  local mon = w.monitor or hl.get_monitor_at_cursor()
+  if mon == nil then
+    return false
+  end
+  local wa = work_area(mon)
+  local cx = w.at.x + w.size.x / 2
+  local cy = w.at.y + w.size.y / 2
+  return cx < wa.x or cx > wa.x + wa.w or cy < wa.y or cy > wa.y + wa.h
+end
+
 local function set_mode(ws, mode)
   if ws == nil or ws.id < 0 then
     return
@@ -165,9 +189,15 @@ local function set_mode(ws, mode)
   end
   if mode == "floating" then
     for _, w in ipairs(hl.get_workspace_windows(ws)) do
-      if not w.floating and w.fullscreen == 0 then
-        hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
-        hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+mode-floated" }))
+      if w.fullscreen == 0 then
+        local offscreen = is_offscreen(w)
+        if not w.floating then
+          hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
+          hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+mode-floated" }))
+        end
+        if offscreen then
+          hl.dispatch(hl.dsp.window.center({ window = w }))
+        end
       end
     end
   else
@@ -315,19 +345,6 @@ end)
 --------------------------------------
 
 local snapped = {}
-
-local function work_area(mon)
-  local scale = mon.scale or 1
-  local res = mon.reserved or {}
-  local rleft = res.left or 0
-  local rtop = res.top or 0
-  return {
-    x = mon.x + rleft,
-    y = mon.y + rtop,
-    w = mon.width / scale - rleft - (res.right or 0),
-    h = mon.height / scale - rtop - (res.bottom or 0),
-  }
-end
 
 local function side_rect(w, side)
   local mon = w.monitor or hl.get_monitor_at_cursor()
