@@ -124,7 +124,7 @@ in
 
       (lib.mkIf (cfg.serverEndpoint != null) {
         nix.settings = {
-          substituters = [ cfg.serverEndpoint ];
+          substituters = [ "${lib.removeSuffix "/" cfg.serverEndpoint}/${cfg.cacheName}" ];
         }
         // (lib.optionalAttrs (cfg.cachePublicKey != null) {
           trusted-public-keys = [ cfg.cachePublicKey ];
