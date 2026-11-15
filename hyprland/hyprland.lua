@@ -54,7 +54,8 @@ hl.config({
     rounding = 0,
     active_opacity = 1.0,
     inactive_opacity = 1.0,
-    shadow = { enabled = false },
+    -- Shown only on floating workspaces; see the floating-ws-shadow rule.
+    shadow = { enabled = true, range = 16, render_power = 3, color = "rgba(00000035)" },
     blur = { enabled = false },
   },
   animations = { enabled = true },
@@ -103,11 +104,27 @@ hl.config({
 ---- per-workspace: dwindle / scrolling / floating, persisted ----
 --------------------------------------------
 
+-- Floating is not a Hyprland layout, so the mode floats the windows
+-- themselves. Windows the mode floated carry FLOATED_TAG so leaving the mode
+-- tiles only those; every window on a floating workspace carries
+-- FLOATING_WS_TAG, which shadows follow. Tags live on the window, so they
+-- survive config reloads and follow it between workspaces.
+local FLOATED_TAG = "mode-floated"
+local FLOATING_WS_TAG = "floating-ws"
+local OPENED_TAG = "mode-opened"
+local OPEN_RULE = "floating-open-"
+local LAST_WORKSPACE = 2147483647
+
 local state_dir = (os.getenv("XDG_STATE_HOME") or (home .. "/.local/state")) .. "/hypr"
 os.execute('mkdir -p "' .. state_dir .. '"')
 local layouts_file = state_dir .. "/layouts.json"
 
+local mode_labels = { dwindle = "Tiling", scrolling = "Scrolling", floating = "Floating" }
+local mode_order = { "dwindle", "scrolling", "floating" }
+
+-- Workspaces without an entry in `modes` follow `default_mode`.
 local modes = {}
+local default_mode = "dwindle"
 
 local function save_modes()
   local parts = {}
@@ -115,6 +132,7 @@ local function save_modes()
     parts[#parts + 1] = '"' .. id .. '":"' .. mode .. '"'
   end
   table.sort(parts)
+  table.insert(parts, 1, '"default":"' .. default_mode .. '"')
   local f = io.open(layouts_file, "w")
   if f then
     f:write("{" .. table.concat(parts, ",") .. "}")
@@ -129,24 +147,41 @@ local function load_modes()
   end
   local content = f:read("*a") or ""
   f:close()
-  for id, mode in string.gmatch(content, '"(%d+)":"(%a+)"') do
-    modes[tonumber(id)] = mode
-    if mode == "scrolling" then
-      hl.workspace_rule({ workspace = id, layout = "scrolling" })
+  local saved = {}
+  for key, mode in string.gmatch(content, '"(%w+)":"(%a+)"') do
+    if mode_labels[mode] then
+      if key == "default" then
+        default_mode = mode
+      elseif tonumber(key) and tonumber(key) >= 1 then
+        saved[tonumber(key)] = mode
+      end
+    end
+  end
+  for id, mode in pairs(saved) do
+    if mode ~= default_mode then
+      modes[id] = mode
     end
   end
 end
-load_modes()
+
+local function tiled_default()
+  return default_mode == "floating" and "dwindle" or default_mode
+end
+
+local function mode_of_id(id)
+  id = tonumber(id)
+  if id == nil or id < 1 then
+    return nil
+  end
+  return modes[id] or default_mode
+end
 
 local function mode_of(ws)
   if ws == nil then
-    return "dwindle"
+    return tiled_default()
   end
-  return modes[ws.id] or "dwindle"
+  return mode_of_id(ws.id) or tiled_default()
 end
-
-local mode_labels = { dwindle = "Tiling", scrolling = "Scrolling", floating = "Floating" }
-local mode_order = { "dwindle", "scrolling", "floating" }
 
 local function work_area(mon)
   local scale = mon.scale or 1
@@ -172,45 +207,179 @@ local function is_offscreen(w)
   return cx < wa.x or cx > wa.x + wa.w or cy < wa.y or cy > wa.y + wa.h
 end
 
-local function set_mode(ws, mode)
-  if ws == nil or ws.id < 0 then
+-- Rule tags are listed with a trailing "*".
+local function has_tag(w, tag)
+  for _, t in ipairs(w.tags or {}) do
+    if t == tag or t == tag .. "*" then
+      return true
+    end
+  end
+  return false
+end
+
+local function set_tag(w, tag, on)
+  if has_tag(w, tag) ~= on then
+    hl.dispatch(hl.dsp.window.tag({ window = w, tag = (on and "+" or "-") .. tag }))
+  end
+end
+
+-- Windows already floating on their own (dialogs, float rules, Super+Shift+M)
+-- are left unclaimed so they stay floating when the mode ends. Everything is
+-- claimed before anything is floated: floating one member of a group floats
+-- the rest, which a single pass would then skip and strand.
+local function float_for_mode(windows)
+  local claiming = {}
+  local offscreen = {}
+  for _, w in ipairs(windows) do
+    set_tag(w, FLOATING_WS_TAG, true)
+    if (w.fullscreen or 0) == 0 then
+      if is_offscreen(w) then
+        offscreen[#offscreen + 1] = w
+      end
+      if not w.floating then
+        set_tag(w, FLOATED_TAG, true)
+        claiming[#claiming + 1] = w
+      end
+    end
+  end
+  for _, w in ipairs(claiming) do
+    hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
+  end
+  -- Windows left outside the screen by scrolling would stay there.
+  for _, w in ipairs(offscreen) do
+    hl.dispatch(hl.dsp.window.center({ window = w }))
+  end
+end
+
+-- Pinned windows stay floating (tiling would unpin them); fullscreen ones are
+-- handled once they leave fullscreen.
+local function tile_for_mode(w)
+  set_tag(w, FLOATING_WS_TAG, false)
+  if not has_tag(w, FLOATED_TAG) or w.pinned or (w.fullscreen or 0) ~= 0 then
     return
   end
-  local cur = mode_of(ws)
-  if cur == "floating" and mode ~= "floating" then
-    for _, w in ipairs(hl.get_workspace_windows(ws)) do
-      for _, t in ipairs(w.tags or {}) do
-        if t == "mode-floated" then
-          hl.dispatch(hl.dsp.window.float({ window = w, action = "disable" }))
-          hl.dispatch(hl.dsp.window.tag({ window = w, tag = "-mode-floated" }))
-        end
-      end
+  set_tag(w, FLOATED_TAG, false)
+  hl.dispatch(hl.dsp.window.float({ window = w, action = "disable" }))
+end
+
+-- Bring windows in line with their workspace's mode. `ws` is passed when a
+-- window is still on its way to it. Special workspaces are left alone.
+local function arrange(windows, ws)
+  local floating = {}
+  for _, w in ipairs(windows) do
+    local target = ws or w.workspace
+    local mode = target and mode_of_id(target.id)
+    if mode == "floating" then
+      floating[#floating + 1] = w
+    elseif mode ~= nil then
+      tile_for_mode(w)
     end
   end
-  if mode == "floating" then
-    for _, w in ipairs(hl.get_workspace_windows(ws)) do
-      if w.fullscreen == 0 then
-        local offscreen = is_offscreen(w)
-        if not w.floating then
-          hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
-          hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+mode-floated" }))
-        end
-        if offscreen then
-          hl.dispatch(hl.dsp.window.center({ window = w }))
-        end
+  float_for_mode(floating)
+end
+
+-- Floating workspaces as id ranges, for the open rules to match.
+local function floating_ranges()
+  local ranges = {}
+  if default_mode == "floating" then
+    local tiled = {}
+    for id, mode in pairs(modes) do
+      if mode ~= "floating" then
+        tiled[#tiled + 1] = id
       end
     end
+    table.sort(tiled)
+    local from = 1
+    for _, n in ipairs(tiled) do
+      if n > from then
+        ranges[#ranges + 1] = { from, n - 1 }
+      end
+      from = n + 1
+    end
+    ranges[#ranges + 1] = { from, LAST_WORKSPACE }
   else
+    for id, mode in pairs(modes) do
+      if mode == "floating" then
+        ranges[#ranges + 1] = { id, id }
+      end
+    end
+    table.sort(ranges, function(a, b) return a[1] < b[1] end)
+  end
+  return ranges
+end
+
+-- Windows opening on a floating workspace float from their first frame
+-- instead of opening tiled and then shrinking. Modal dialogs and apps with
+-- float rules of their own are left to float on their own account.
+local open_rules = 0
+
+local function sync_open_rules()
+  local ranges = floating_ranges()
+  for i, range in ipairs(ranges) do
+    hl.window_rule({
+      name = OPEN_RULE .. i,
+      enabled = true,
+      match = {
+        workspace = string.format("r[%d-%d]", range[1], range[2]),
+        modal = false,
+        class = "negative:^(floating-tui)$",
+      },
+      float = true,
+      size = "min(1100,monitor_w*0.64) min(760,monitor_h*0.68)",
+      center = true,
+      tag = "+" .. OPENED_TAG,
+    })
+  end
+  for i = #ranges + 1, open_rules do
+    hl.window_rule({ name = OPEN_RULE .. i, enabled = false })
+  end
+  open_rules = math.max(open_rules, #ranges)
+end
+
+-- Overlapping windows are picked with the pointer, so floating workspaces
+-- focus on click and resize from any edge; others keep the defaults.
+local input_floating = nil
+
+local function update_input()
+  local ws = hl.get_active_workspace()
+  local floating = ws ~= nil and mode_of_id(ws.id) == "floating"
+  if floating == input_floating then
+    return
+  end
+  input_floating = floating
+  hl.config({
+    input = { follow_mouse = floating and 0 or 1 },
+    general = { resize_on_border = floating },
+  })
+end
+
+local function notify_layout(title, mode)
+  hl.exec_cmd('notify-send -t 1200 -r 69 "' .. title .. '" "' .. (mode_labels[mode] or mode) .. '"')
+end
+
+local function set_mode(ws, mode)
+  if ws == nil or ws.id < 1 then
+    return
+  end
+  -- Floating keeps whatever tiled layout the workspace had.
+  if mode ~= "floating" then
     hl.workspace_rule({ workspace = tostring(ws.id), layout = mode })
   end
-  modes[ws.id] = mode
+  if mode == default_mode then
+    modes[ws.id] = nil
+  else
+    modes[ws.id] = mode
+  end
   save_modes()
-  hl.exec_cmd('notify-send -t 1200 -r 69 "Workspace layout" "' .. (mode_labels[mode] or mode) .. '"')
+  sync_open_rules()
+  arrange(hl.get_workspace_windows(ws))
+  update_input()
+  notify_layout("Workspace layout", mode)
 end
 
 function CycleWorkspaceLayout(dir)
   local ws = hl.get_active_workspace()
-  if ws == nil or ws.id < 0 then
+  if ws == nil or ws.id < 1 then
     return
   end
   local cur = mode_of(ws)
@@ -224,21 +393,90 @@ function CycleWorkspaceLayout(dir)
   set_mode(ws, mode_order[idx])
 end
 
--- New windows opened on a floating workspace float too.
-hl.on("window.open", function(w)
-  local ws = w.workspace
-  if ws ~= nil and ws.id > 0 and modes[ws.id] == "floating" and not w.floating and w.fullscreen == 0 then
-    hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
-    hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+mode-floated" }))
+-- Change the layout of workspaces without one of their own. Workspaces with
+-- windows (including minimized ones) keep the layout they have now.
+-- Run via `hypr-layout-default <mode>`.
+function SetDefaultLayout(mode)
+  if not mode_labels[mode] then
+    return
   end
+  local busy = {}
+  for _, ws in ipairs(hl.get_workspaces()) do
+    if ws.id >= 1 and #hl.get_workspace_windows(ws) > 0 then
+      busy[ws.id] = true
+    end
+  end
+  for _, w in ipairs(hl.get_windows()) do
+    for _, t in ipairs(w.tags or {}) do
+      local origin = tonumber(string.match(t, "^minimized%-from%-(%d+)$"))
+      if origin then
+        busy[origin] = true
+      end
+    end
+  end
+  for id in pairs(busy) do
+    modes[id] = modes[id] or default_mode
+  end
+  for id, m in pairs(modes) do
+    if not busy[id] or m == mode then
+      modes[id] = nil
+    end
+  end
+  default_mode = mode
+  save_modes()
+  notify_layout("Default workspace layout", mode)
+  -- Reload so runtime workspace rules from earlier cycling are dropped.
+  hl.exec_cmd("@hyprctl@ reload")
+end
+
+load_modes()
+save_modes()
+hl.config({ general = { layout = tiled_default() } })
+for id, mode in pairs(modes) do
+  if mode ~= "floating" then
+    hl.workspace_rule({ workspace = tostring(id), layout = mode })
+  end
+end
+sync_open_rules()
+
+hl.on("window.open", function(w)
+  -- The open rule floated it; claim it so the mode tiles it again later.
+  if has_tag(w, OPENED_TAG) then
+    set_tag(w, FLOATED_TAG, true)
+  end
+  arrange({ w })
 end)
+
+-- A move is still being committed when this fires, and changing the floating
+-- state underneath it loses the move, so let it land first.
+hl.on("window.move_to_workspace", function(w, ws)
+  hl.timer(function()
+    arrange({ w }, ws)
+  end, { type = "oneshot", timeout = 1 })
+end)
+
+-- Fullscreen windows are skipped, so arrange them once they come back out.
+hl.on("window.fullscreen", function(w)
+  hl.timer(function()
+    arrange({ w })
+  end, { type = "oneshot", timeout = 1 })
+end)
+
+hl.on("workspace.active", update_input)
+hl.on("monitor.focused", update_input)
+
+-- A reload is a fresh start here but not for the windows: bring them all in
+-- line with the modes as they stand now.
+arrange(hl.get_windows())
+update_input()
 
 -----------------------------------------
 ---- MINIMIZE (Omarchy-style) ----
 ---- Super+Shift+H minimizes from any workspace mode; window is parked on
 ---- special:minimized and tagged with its origin workspace.
----- Restore by clicking its icon in the bar (hypr-restore)
----- or Super+Alt+M for the most recent one.
+---- Restore by clicking its icon in the bar (RestoreMinimized)
+---- or Super+Alt+M for the most recent one. Floating state on restore is
+---- left to arrange(), via the window.move_to_workspace hook.
 -----------------------------------------
 
 local function park_window(w)
@@ -246,6 +484,8 @@ local function park_window(w)
   if ws == nil or ws.id < 0 then
     return
   end
+  local active = hl.get_active_window()
+  local was_active = active ~= nil and active.address == w.address
   if w.fullscreen ~= 0 then
     -- Remember the fullscreen mode so restore can re-apply it.
     hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+minimized-fs-" .. w.fullscreen }))
@@ -258,6 +498,10 @@ local function park_window(w)
   end
   hl.dispatch(hl.dsp.window.tag({ window = w, tag = "+minimized-from-" .. ws.id }))
   hl.dispatch(hl.dsp.window.move({ window = w, workspace = "special:minimized", follow = false }))
+  -- Focus would otherwise stay on the hidden window.
+  if was_active then
+    hl.dispatch(hl.dsp.focus({ workspace = tostring(ws.id) }))
+  end
 end
 
 local function restore_window(w)
@@ -271,11 +515,6 @@ local function restore_window(w)
   hl.dispatch(hl.dsp.window.move({ window = w, workspace = target, follow = true }))
   if origin ~= nil then
     hl.dispatch(hl.dsp.window.tag({ window = w, tag = "-minimized-from-" .. origin }))
-  end
-  if modes[tonumber(target)] == "floating" then
-    hl.dispatch(hl.dsp.window.float({ window = w, action = "enable" }))
-  else
-    hl.dispatch(hl.dsp.window.float({ window = w, action = "disable" }))
   end
   if fs_mode ~= nil then
     hl.dispatch(hl.dsp.window.tag({ window = w, tag = "-minimized-fs-" .. fs_mode }))
@@ -312,13 +551,22 @@ function RestoreLastMinimized()
   if #wins == 0 then
     return
   end
+  -- Lower focus_history_id = focused more recently.
   local best = nil
   for _, w in ipairs(wins) do
-    if best == nil or (w.focus_history_id or 0) > (best.focus_history_id or 0) then
+    if best == nil or (w.focus_history_id or 0) < (best.focus_history_id or 0) then
       best = w
     end
   end
   restore_window(best)
+end
+
+-- Called by the bar: hyprctl eval 'RestoreMinimized("0x...")'
+function RestoreMinimized(address)
+  local w = hl.get_window("address:" .. address)
+  if w ~= nil and w.workspace ~= nil and w.workspace.name == "special:minimized" then
+    restore_window(w)
+  end
 end
 
 -- Apps with their own minimize button (CSD) ask the compositor to
@@ -597,6 +845,19 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(home .. "/.local/bin/brightness
 --------------------------
 ---- WINDOWS RULES ----
 --------------------------
+
+-- Overlapping windows need depth to tell apart; tiled ones don't.
+hl.window_rule({
+  name = "no-shadow",
+  match = { class = ".*" },
+  no_shadow = true,
+})
+
+hl.window_rule({
+  name = "floating-ws-shadow",
+  match = { tag = FLOATING_WS_TAG },
+  no_shadow = false,
+})
 
 hl.window_rule({
   name = "floating-tui",

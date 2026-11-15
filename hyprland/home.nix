@@ -6,8 +6,8 @@
 #   - Quickshell provides the bar and the menu (./quickshell/*.qml)
 #   - Keybinds are ported from the niri config in home.nix, adjusted:
 #       Super+H/J/K/L focus, Super+Y cycles workspace layout
-#       (dwindle -> scrolling -> floating, Omarchy-style), Super+Shift+H minimizes
-#       a window on a floating workspace to special:minimized (Omarchy-style)
+#       (dwindle -> scrolling -> floating, Omarchy-style; `hypr-layout-default`
+#       sets the default), Super+Shift+H minimizes a window to special:minimized
 {
   config,
   pkgs,
@@ -22,16 +22,26 @@ in
   home.packages = with pkgs; [
     quickshell
     libqalculate # qalc, used by the menu calculator
-    jq # used by hypr-restore
     hyprshot
     hyprshell # Super+Tab window switcher daemon
     wl-clipboard # wl-copy, used to copy calculator results
+    # Show or set the layout of workspaces without one of their own
+    (writeShellScriptBin "hypr-layout-default" ''
+      case "''${1:-}" in
+        "")
+          mode=$(sed -n 's/.*"default":"\([a-z]*\)".*/\1/p' "''${XDG_STATE_HOME:-$HOME/.local/state}/hypr/layouts.json" 2>/dev/null)
+          echo "''${mode:-dwindle}"
+          ;;
+        dwindle | scrolling | floating)
+          ${pkgs.hyprland}/bin/hyprctl eval "SetDefaultLayout(\"$1\")" >/dev/null
+          ;;
+        *)
+          echo "usage: hypr-layout-default [dwindle|scrolling|floating]" >&2
+          exit 1
+          ;;
+      esac
+    '')
   ];
-
-  home.file.".local/bin/hypr-restore" = {
-    source = ./hypr-restore.sh;
-    executable = true;
-  };
 
   xdg.configFile."hypr/hyprland.lua".source = pkgs.replaceVars ./hyprland.lua {
     kitty = "${pkgs.kitty}/bin/kitty";

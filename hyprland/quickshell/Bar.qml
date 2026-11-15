@@ -25,11 +25,11 @@ Variants {
         }
 
         // Per-workspace layout modes, written by hyprland.lua to
-        // ~/.local/state/hypr/layouts.json ({ "1": "floating", ... }).
+        // ~/.local/state/hypr/layouts.json ({ "default": "dwindle", "1": "floating", ... }).
         property var layouts: ({})
 
         function layoutGlyph(wsId) {
-            const mode = bar.layouts[String(wsId)] ?? "dwindle";
+            const mode = bar.layouts[String(wsId)] ?? bar.layouts["default"] ?? "dwindle";
             if (mode === "floating")
                 return "▲";
             if (mode === "scrolling")
@@ -50,28 +50,16 @@ Variants {
             return address.startsWith("0x") ? address : "0x" + address;
         }
 
-        Process {
-            id: layoutProc
-
-            command: ["cat", Quickshell.env("HOME") + "/.local/state/hypr/layouts.json"]
-            stdout: StdioCollector {
-                onStreamFinished: {
-                    try {
-                        bar.layouts = JSON.parse(text);
-                    } catch (e) {
-                    }
+        FileView {
+            path: Quickshell.env("HOME") + "/.local/state/hypr/layouts.json"
+            watchChanges: true
+            onFileChanged: reload()
+            onLoaded: {
+                try {
+                    bar.layouts = JSON.parse(text());
+                } catch (e) {
+                    // Caught mid-write; the next change event reloads it.
                 }
-            }
-        }
-
-        Timer {
-            interval: 2000
-            running: true
-            repeat: true
-            triggeredOnStart: true
-            onTriggered: {
-                if (!layoutProc.running)
-                    layoutProc.running = true;
             }
         }
 
@@ -182,7 +170,7 @@ Variants {
 
                             anchors.fill: parent
                             hoverEnabled: true
-                            onClicked: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hypr-restore", bar.normAddr(minButton.modelData.address)])
+                            onClicked: Quickshell.execDetached(["hyprctl", "eval", "RestoreMinimized(\"" + bar.normAddr(minButton.modelData.address) + "\")"])
                         }
                     }
                 }
